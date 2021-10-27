@@ -41,6 +41,59 @@ def asset_params_value_not_equal(request: dict, param_id: str, expected: str):
     asset_params_value(request, param_id, '!=', expected)
 
 
+def asset_params_value_greater(request: dict, param_id: str, expected: str):
+    asset_params_value(request, param_id, '<', expected)
+
+
+def asset_params_value_greater_or_equal(request: dict, param_id: str, expected: str):
+    asset_params_value(request, param_id, '<=', expected)
+
+
+def asset_params_value_lesser(request: dict, param_id: str, expected: str):
+    asset_params_value(request, param_id, '>', expected)
+
+
+def asset_params_value_lesser_or_equal(request: dict, param_id: str, expected: str):
+    asset_params_value(request, param_id, '>=', expected)
+
+
+def asset_params_value_contains(request: dict, param_id: str, expected: str):
+    asset_params_value(request, param_id, 'in', expected)
+
+
+# error asset params
+
+def asset_params_value_equal_error(request: dict, param_id: str, expected: str):
+    asset_params_value_error(request, param_id, '==', expected)
+
+
+def asset_params_value_not_equal_error(request: dict, param_id: str, expected: str):
+    asset_params_value_error(request, param_id, '!=', expected)
+
+
+def asset_params_value_greater_error(request: dict, param_id: str, expected: str):
+    asset_params_value_error(request, param_id, '<', expected)
+
+
+def asset_params_value_greater_or_equal_error(request: dict, param_id: str, expected: str):
+    asset_params_value_error(request, param_id, '<=', expected)
+
+
+def asset_params_value_lesser_error(request: dict, param_id: str, expected: str):
+    asset_params_value_error(request, param_id, '>', expected)
+
+
+def asset_params_value_lesser_or_equal_error(request: dict, param_id: str, expected: str):
+    asset_params_value_error(request, param_id, '>=', expected)
+
+
+def asset_params_value_contains_error(request: dict, param_id: str, expected: str):
+    asset_params_value_error(request, param_id, 'in', expected)
+
+
+# TCR asserts
+
+
 def tcr_status(expected: str, request: dict):
     assert request['configuration']['status'] == expected
 
@@ -55,3 +108,61 @@ def tcr_params_value_error(request: dict, param_id: str, operator: str, expected
     fn = __operators.get(operator)
     param = find_by_id(request['configuration']['params'], param_id)
     assert fn(param['value_error'], expected)
+
+
+def tcr_params_value_equal(request: dict, param_id: str, expected: str):
+    tcr_params_value(request, param_id, '==', expected)
+
+
+def tcr_params_value_not_equal(request: dict, param_id: str, expected: str):
+    tcr_params_value(request, param_id, '!=', expected)
+
+
+def tcr_params_value_greater(request: dict, param_id: str, expected: str):
+    tcr_params_value(request, param_id, '<', expected)
+
+
+def tcr_params_value_greater_or_equal(request: dict, param_id: str, expected: str):
+    tcr_params_value(request, param_id, '<=', expected)
+
+
+def tcr_params_value_lesser(request: dict, param_id: str, expected: str):
+    tcr_params_value(request, param_id, '>', expected)
+
+
+def tcr_params_value_lesser_or_equal(request: dict, param_id: str, expected: str):
+    tcr_params_value(request, param_id, '>=', expected)
+
+
+def tcr_params_value_contains(request: dict, param_id: str, expected: str):
+    tcr_params_value(request, param_id, 'in', expected)
+
+# TCR value error
+
+
+def tcr_params_value_equal_error(request: dict, param_id: str, expected: str):
+    tcr_params_value_error(request, param_id, '==', expected)
+
+
+def tcr_params_value_not_equal_error(request: dict, param_id: str, expected: str):
+    tcr_params_value_error(request, param_id, '!=', expected)
+
+
+def tcr_params_value_greater_error(request: dict, param_id: str, expected: str):
+    tcr_params_value_error(request, param_id, '<', expected)
+
+
+def tcr_params_value_greater_or_equal_error(request: dict, param_id: str, expected: str):
+    tcr_params_value_error(request, param_id, '<=', expected)
+
+
+def tcr_params_value_lesser_error(request: dict, param_id: str, expected: str):
+    tcr_params_value_error(request, param_id, '>', expected)
+
+
+def tcr_params_value_lesser_or_equal_error(request: dict, param_id: str, expected: str):
+    tcr_params_value_error(request, param_id, '>=', expected)
+
+
+def tcr_params_value_contains_error(request: dict, param_id: str, expected: str):
+    tcr_params_value_error(request, param_id, 'in', expected)
