@@ -7,8 +7,8 @@ license = "MIT"
 
 [tool.poetry.dependencies]
 python = "^3.8"
-connect-openapi-client = "^23.1"
-behave = "^1.2.6"
+connect-openapi-client = "^23.*"
+behave = "^1.2.*"
 
 [tool.poetry.dev-dependencies]
 
