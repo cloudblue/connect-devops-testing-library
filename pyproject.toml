@@ -1,0 +1,43 @@
+[tool.poetry]
+name = "hoare"
+version = "0.1.0"
+description = "Testing framework to ease the development of Connect EaaS Processors."
+authors = ["Unay Santisteban <davidunay.santisteban@cloudblue.com>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.8"
+connect-openapi-client = "^23.1"
+behave = "^1.2.6"
+
+[tool.poetry.dev-dependencies]
+
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+testpaths = "tests"
+log_cli = false
+log_cli_level = "INFO"
+log_cli_format = "%(asctime)s [%(levelname)-5s] :: %(message)s"
+log_cli_date_format = "%Y-%m-%d %H:%M:%S"
+
+[tool.coverage.run]
+omit = ["tests/*", "venv*/*", "setup.py"]
+relative_files = true
+branch = true
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __str__",
+    "def __repr__",
+    "import",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+]
+
+[tool.coverage.html]
+skip_covered = true

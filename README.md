@@ -1,2 +1,3 @@
-# hoare
-Testing framework to ease the development of Connet EaaS Processors.
+# Hoare
+
+Testing framework to ease the development of Connect EaaS Processors.
