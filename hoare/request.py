@@ -1,12 +1,11 @@
 from __future__ import annotations
-from cnct import ConnectClient
-from typing import Optional
 from copy import deepcopy
+from typing import Optional
+from connect.client import ConnectClient
+from hoare.utils import find_by_id
 import datetime
 import json
 import time
-
-from hoare.utils import find_by_id
 
 _request_template = {
     "id": "PR-0000-0000-0000-000",
@@ -164,7 +163,7 @@ class Builder:
         self._request['asset']['status'] = asset_status
         return self
 
-    def with_asset_product(self, product_id: str, name: str, status: str) -> Builder:
+    def with_asset_product(self, product_id: str, name: str, status: str = 'published') -> Builder:
         self._request['asset']['product'] = self._request['asset']['product'].update({
             "id": product_id,
             "name": name,

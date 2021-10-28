@@ -1,5 +1,4 @@
 import operator
-
 from hoare.utils import find_by_id
 
 __operators = {
@@ -31,12 +30,6 @@ def asset_params_value(request: dict, param_id: str, operator: str, expected: st
     assert fn(param['value'], expected)
 
 
-def asset_params_value_error(request: dict, param_id: str, operator: str, expected: str):
-    fn = __operators.get(operator)
-    param = find_by_id(request['asset']['params'], param_id)
-    assert fn(param['value_error'], expected)
-
-
 def asset_params_value_equal(request: dict, param_id: str, expected: str):
     asset_params_value(request, param_id, '==', expected)
 
@@ -65,7 +58,11 @@ def asset_params_value_contains(request: dict, param_id: str, expected: str):
     asset_params_value(request, param_id, 'in', expected)
 
 
-# error asset params
+def asset_params_value_error(request: dict, param_id: str, operator: str, expected: str):
+    fn = __operators.get(operator)
+    param = find_by_id(request['asset']['params'], param_id)
+    assert fn(param['value_error'], expected)
+
 
 def asset_params_value_equal_error(request: dict, param_id: str, expected: str):
     asset_params_value_error(request, param_id, '==', expected)
@@ -95,9 +92,6 @@ def asset_params_value_contains_error(request: dict, param_id: str, expected: st
     asset_params_value_error(request, param_id, 'in', expected)
 
 
-# TCR asserts
-
-
 def tcr_status(expected: str, request: dict):
     assert request['configuration']['status'] == expected
 
@@ -106,12 +100,6 @@ def tcr_params_value(request: dict, param_id: str, operator: str, expected: str)
     fn = __operators.get(operator)
     param = find_by_id(request['configuration']['params'], param_id)
     assert fn(param['value'], expected)
-
-
-def tcr_params_value_error(request: dict, param_id: str, operator: str, expected: str):
-    fn = __operators.get(operator)
-    param = find_by_id(request['configuration']['params'], param_id)
-    assert fn(param['value_error'], expected)
 
 
 def tcr_params_value_equal(request: dict, param_id: str, expected: str):
@@ -141,7 +129,11 @@ def tcr_params_value_lesser_or_equal(request: dict, param_id: str, expected: str
 def tcr_params_value_contains(request: dict, param_id: str, expected: str):
     tcr_params_value(request, param_id, 'in', expected)
 
-# TCR value error
+
+def tcr_params_value_error(request: dict, param_id: str, operator: str, expected: str):
+    fn = __operators.get(operator)
+    param = find_by_id(request['configuration']['params'], param_id)
+    assert fn(param['value_error'], expected)
 
 
 def tcr_params_value_equal_error(request: dict, param_id: str, expected: str):
