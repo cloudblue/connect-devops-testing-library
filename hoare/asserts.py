@@ -17,6 +17,10 @@ def request_status(request: dict, expected: str):
     assert request['status'] == expected
 
 
+def task_response_status(task_response, expected):
+    assert task_response.status == expected
+
+
 def asset_status(request: dict, expected: str):
     assert request['asset']['status'] == expected
 
