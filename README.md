@@ -1,6 +1,8 @@
 # Hoare
 
-Testing framework to ease the development of Connect EaaS Processors.
+> Why Hoare? It's in honor of Tony Hoare, who develop the Hoare logic for verifying program correctness.
+
+Testing framework to ease Connect EaaS Processors development.
 
 Hoare has a small request builder to ease the manipulation of the connect requests during testing:
 
@@ -58,7 +60,9 @@ def test_should_approve_request(mocked_connect_client, mocked_service_client, lo
 ```
 
 Additionally, you may want to create real end-to-end test calling Connect and evaluating the processed request, for this
-you should use the built-in request dispatcher. Let's see example:
+you should use the built-in request dispatcher. The dispatcher will take automatically the required credentials from the
+environment variables in `CONNECT_API_KEY` and `CONNECT_API_URL`. Alternatively you can pass explicitly the credentials to 
+the `make_request_dispatcher(api_key=XXX, api_url=YYY)` function. Let's see example:
 
 ```python
 from hoare import asserts, fixures

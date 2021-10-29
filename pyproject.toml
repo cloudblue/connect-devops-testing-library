@@ -1,14 +1,28 @@
 [tool.poetry]
 name = "hoare"
-version = "0.1.0"
-description = "Testing framework to ease the development of Connect EaaS Processors."
-authors = ["Unay Santisteban <davidunay.santisteban@cloudblue.com>"]
+version = "0.1.1"
 license = "MIT"
+description = "Testing framework to ease Connect EaaS Processors development."
+authors = [
+    "Unay Santisteban <davidunay.santisteban@cloudblue.com>"
+]
+readme = 'README.md'
+keywords = [
+    'connect', 'eaas', 'testing', 'framework'
+]
+repository = 'https://github.com/othercodes/hoare'
+packages = [
+    { include = "hoare" },
+]
+classifiers = [
+    "Topic :: Software Development :: Build Tools",
+    "Topic :: Software Development :: Libraries :: Python Modules"
+]
 
 [tool.poetry.dependencies]
 python = "^3.8"
-connect-openapi-client = "^23.*"
 behave = "^1.2.*"
+connect-openapi-client = "^23.*"
 
 [tool.poetry.dev-dependencies]
 
@@ -20,7 +34,7 @@ build-backend = "poetry.core.masonry.api"
 [tool.pytest.ini_options]
 testpaths = "tests"
 log_cli = false
-log_cli_level = "INFO"
+log_cli_level = "DEBUG"
 log_cli_format = "%(asctime)s [%(levelname)-5s] :: %(message)s"
 log_cli_date_format = "%Y-%m-%d %H:%M:%S"
 

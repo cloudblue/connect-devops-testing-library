@@ -130,3 +130,9 @@ dmypy.json
 
 # Idea directory
 .idea/
+
+# samples
+samples/
+
+# poetry
+poetry.lock
