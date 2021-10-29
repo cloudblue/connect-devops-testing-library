@@ -2,15 +2,23 @@
 name = "hoare"
 version = "0.1.1"
 license = "MIT"
-description = "Testing framework to ease Connect EaaS Processors development."
-authors = [
-    "Unay Santisteban <davidunay.santisteban@cloudblue.com>"
-]
 readme = 'README.md'
-keywords = [
-    'connect', 'eaas', 'testing', 'framework'
-]
+description = "Testing framework to ease Connect EaaS Processors development."
 repository = 'https://github.com/othercodes/hoare'
+authors = [
+    "CloudBlue LLC"
+]
+maintainers = [
+    "Unay Santisteban <davidunay.santisteban@cloudblue.com>",
+    "Ivan Camus <ivan.camus@cloudblue.com>"
+]
+keywords = [
+    'connect',
+    'eaas',
+    'testing',
+    'framework'
+]
+
 packages = [
     { include = "hoare" },
 ]
@@ -20,12 +28,15 @@ classifiers = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.7"
 behave = "^1.2.*"
 connect-openapi-client = "^23.*"
 
 [tool.poetry.dev-dependencies]
-
+pytest = "^6.1.2"
+pytest-cov = "^2.10.1"
+pytest-mock = "^3.3.1"
+coverage = { extras = ["toml"], version = "^5.3" }
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
@@ -33,10 +44,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.pytest.ini_options]
 testpaths = "tests"
-log_cli = false
-log_cli_level = "DEBUG"
-log_cli_format = "%(asctime)s [%(levelname)-5s] :: %(message)s"
-log_cli_date_format = "%Y-%m-%d %H:%M:%S"
+addopts = "-p no:cacheprovider --cov=hoare --cov-report=html --cov-report xml --cov-report term"
 
 [tool.coverage.run]
 omit = ["tests/*", "venv*/*", "setup.py"]

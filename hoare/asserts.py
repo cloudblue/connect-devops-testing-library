@@ -54,8 +54,10 @@ def asset_params_value_lesser_or_equal(request: dict, param_id: str, expected: s
     asset_params_value(request, param_id, '>=', expected)
 
 
-def asset_params_value_contains(request: dict, param_id: str, expected: str):
-    asset_params_value(request, param_id, 'in', expected)
+def asset_params_value_contains(request: dict, param_id: str, expected):
+    fn = __operators.get('in')
+    param = find_by_id(request['asset']['params'], param_id)
+    assert fn(expected, param['value'])
 
 
 def asset_params_value_error(request: dict, param_id: str, operator: str, expected: str):
@@ -88,8 +90,10 @@ def asset_params_value_lesser_or_equal_error(request: dict, param_id: str, expec
     asset_params_value_error(request, param_id, '>=', expected)
 
 
-def asset_params_value_contains_error(request: dict, param_id: str, expected: str):
-    asset_params_value_error(request, param_id, 'in', expected)
+def asset_params_value_contains_error(request: dict, param_id: str, expected):
+    fn = __operators.get('in')
+    param = find_by_id(request['asset']['params'], param_id)
+    assert fn(expected, param['value_error'])
 
 
 def tcr_status(expected: str, request: dict):
@@ -127,7 +131,9 @@ def tcr_params_value_lesser_or_equal(request: dict, param_id: str, expected: str
 
 
 def tcr_params_value_contains(request: dict, param_id: str, expected: str):
-    tcr_params_value(request, param_id, 'in', expected)
+    fn = __operators.get('in')
+    param = find_by_id(request['configuration']['params'], param_id)
+    assert fn(expected, param['value'])
 
 
 def tcr_params_value_error(request: dict, param_id: str, operator: str, expected: str):
@@ -161,4 +167,6 @@ def tcr_params_value_lesser_or_equal_error(request: dict, param_id: str, expecte
 
 
 def tcr_params_value_contains_error(request: dict, param_id: str, expected: str):
-    tcr_params_value_error(request, param_id, 'in', expected)
+    fn = __operators.get('in')
+    param = find_by_id(request['configuration']['params'], param_id)
+    assert fn(expected, param['value_error'])

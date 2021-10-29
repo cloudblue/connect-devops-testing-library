@@ -164,7 +164,7 @@ class Builder:
         return self
 
     def with_asset_product(self, product_id: str, name: str, status: str = 'published') -> Builder:
-        self._request['asset']['product'] = self._request['asset']['product'].update({
+        self._request['asset']['product'].update({
             "id": product_id,
             "name": name,
             "status": status
