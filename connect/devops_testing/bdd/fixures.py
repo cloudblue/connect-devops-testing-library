@@ -1,5 +1,5 @@
 from behave.runner import Context
-from hoare.fixures import make_request_dispatcher, make_request_builder
+from connect.devops_testing.fixures import make_request_dispatcher, make_request_builder
 
 
 def use_connect_request_dispatcher(context: Context):

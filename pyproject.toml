@@ -1,26 +1,21 @@
 [tool.poetry]
-name = "hoare"
-version = "0.1.1"
-license = "MIT"
-readme = 'README.md'
+name = "connect-devops_testing-library"
+version = "0.1.0"
+license = "Apache-2.0"
+readme = './README.md'
 description = "Testing framework to ease Connect EaaS Processors development."
-repository = 'https://github.com/othercodes/hoare'
+repository = 'https://github.com/cloudblue/connect-devops-testing-library'
+packages = [
+    { include = "connect" },
+]
 authors = [
     "CloudBlue LLC"
-]
-maintainers = [
-    "Unay Santisteban <davidunay.santisteban@cloudblue.com>",
-    "Ivan Camus <ivan.camus@cloudblue.com>"
 ]
 keywords = [
     'connect',
     'eaas',
     'testing',
     'framework'
-]
-
-packages = [
-    { include = "hoare" },
 ]
 classifiers = [
     "Topic :: Software Development :: Build Tools",
@@ -44,7 +39,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.pytest.ini_options]
 testpaths = "tests"
-addopts = "-p no:cacheprovider --cov=hoare --cov-report=html --cov-report xml --cov-report term"
+addopts = "-p no:cacheprovider --cov=connect.devops_testing --cov-report=html --cov-report=xml --cov-report=term"
 
 [tool.coverage.run]
 omit = ["tests/*", "venv*/*", "setup.py"]

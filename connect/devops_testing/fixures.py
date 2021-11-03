@@ -1,5 +1,5 @@
 from typing import Optional
-from hoare.request import Dispatcher, Builder
+from connect.devops_testing.request import Dispatcher, Builder
 import os
 
 __CONNECT_API_KEY = 'CONNECT_API_KEY'

@@ -1,4 +1,4 @@
-from hoare import fixures
+from connect.devops_testing import fixures
 
 
 def test_should_build_successfully_a_valid_request():

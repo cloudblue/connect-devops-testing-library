@@ -1,13 +1,11 @@
-# Hoare
+# Connect DevOps Testing Library
 
-> Why Hoare? It's in honor of Tony Hoare, who develop the Hoare logic for verifying program correctness.
+Testing library to ease Connect EaaS Processors development.
 
-Testing framework to ease Connect EaaS Processors development.
-
-Hoare has a small request builder to ease the manipulation of the connect requests during testing:
+DevOps Testing Library has a small request builder to ease the manipulation of the connect requests during testing:
 
 ````python
-from hoare import fixures
+from connect.devops_testing import fixures
 import os
 
 template  = os.path.dirname(__file__) + '/request.json'
@@ -21,20 +19,21 @@ request = fixures.make_request_builder(template) \
     .build()
 ````
 
-Hoare also has several built-in assert function that can be easily used to evaluate a connect request response:
+DevOps Testing Library also has several built-in assert functions that can be easily used to evaluate a connect request 
+response:
 
 ```python
-from hoare import asserts
+from connect.devops_testing import asserts
 
 asserts.request_status(request, 'approved')
 asserts.asset_status(request, 'active')
 asserts.asset_params_value_not_equal(request, 'SOME_ASSET_PARAM_ID_001', 'some_expected_value')
 ```
 
-Using these two features you can easily create a small test to check a purchase request of your connector:
+Using these two features you can easily create a small test to check a purchase request of your processor:
 
 ```python
-from hoare import fixures, asserts
+from connect.devops_testing import fixures, asserts
 from my_ext.extension import MyExtension
 import os
 
@@ -61,11 +60,11 @@ def test_should_approve_request(mocked_connect_client, mocked_service_client, lo
 
 Additionally, you may want to create real end-to-end test calling Connect and evaluating the processed request, for this
 you should use the built-in request dispatcher. The dispatcher will take automatically the required credentials from the
-environment variables in `CONNECT_API_KEY` and `CONNECT_API_URL`. Alternatively you can pass explicitly the credentials to 
-the `make_request_dispatcher(api_key=XXX, api_url=YYY)` function. Let's see example:
+environment variables in `CONNECT_API_KEY` and `CONNECT_API_URL`. Alternatively, you can pass explicitly the credentials 
+to the `make_request_dispatcher(api_key=XXX, api_url=YYY)` function. Let's see example:
 
 ```python
-from hoare import asserts, fixures
+from connect.devops_testing import asserts, fixures
 import os
 
 def test_should_approve_purchase_request_successfully():
@@ -91,18 +90,18 @@ def test_should_approve_purchase_request_successfully():
 
 Once the request is dispatched the Dispatcher will reload the request again every `10` seconds a maximum of `20` 
 attempts. If the request has not been processed the asserts may fail. The wait time between request reload can be 
-configured directly in the `.provision_request()` method call.
+configured directly in the `.provision_request(api_key=, api_url=)` method call.
 
 Obviously, some Connect processors may take a lot of time to process a request, for those type of processors this kind
 of end-to-end test is not suitable.
 
-Finally, Hoare also allows you to easily use Behave! BDD tool for you test. You just need to set the following code in 
-your `features/environment.py` file
+Finally, the DevOps Testing Library also allows you to easily use Behave! BDD tool for you test. You just need to set 
+the following code in your `features/environment.py` file
 
 ```python
-from hoare.bdd.fixures import use_connect_request_dispatcher, use_connect_request_builder
+from connect.devops_testing.bdd.fixures import use_connect_request_dispatcher, use_connect_request_builder
 # import the built-in steps for e2e testing. 
-from hoare.bdd import steps
+from connect.devops_testing.bdd import steps
 
 def before_all(context):
     # attach the request dispatcher to the behave context if you want do e2e test.
@@ -126,7 +125,7 @@ Now let's define the steps in `features/steps/purchase.py` file
 
 ```python
 from behave import given, then
-from hoare import asserts
+from connect.devops_testing import asserts
 import os
 
 
@@ -145,4 +144,4 @@ def step_impl(context):
     asserts.asset_params_value_not_equal(context.request, 'CUSTOMER_EMAIL_ADDRESS', '')
 ```
 
-The `@when("subscription request is processed")` is provided by Hoare framework.
+The `@when("subscription request is processed")` is provided by the DevOps Testing Library.

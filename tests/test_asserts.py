@@ -1,4 +1,4 @@
-from hoare import asserts
+from connect.devops_testing import asserts
 
 request = {'asset': {'params': [{'id': 'ID', 'value': 'value', 'value_error': 'some error'}]}}
 

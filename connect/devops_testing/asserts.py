@@ -1,5 +1,5 @@
 import operator
-from hoare.utils import find_by_id
+from connect.devops_testing.utils import find_by_id
 
 __operators = {
     '==': operator.eq,

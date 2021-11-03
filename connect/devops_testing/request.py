@@ -2,7 +2,7 @@ from __future__ import annotations
 from copy import deepcopy
 from typing import Optional
 from connect.client import ConnectClient
-from hoare.utils import find_by_id
+from connect.devops_testing.utils import find_by_id
 import datetime
 import json
 import time
