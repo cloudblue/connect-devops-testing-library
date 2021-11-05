@@ -1,4 +1,4 @@
-from typing import Optional, List
+from typing import List, Optional
 
 
 def find_by_id(collection: List, element_id: str) -> Optional[dict]:

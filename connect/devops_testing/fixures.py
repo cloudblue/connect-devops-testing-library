@@ -1,12 +1,17 @@
 from typing import Optional
-from connect.devops_testing.request import Dispatcher, Builder
+
+from connect.devops_testing.request import Builder, Dispatcher
+
 import os
 
 __CONNECT_API_KEY = 'CONNECT_API_KEY'
 __CONNECT_API_URL = 'CONNECT_API_URL'
 
 
-def __get_credentials_from_env(api_key: Optional[str] = None, api_url: Optional[str] = None) -> dict:
+def __get_credentials_from_env(
+    api_key: Optional[str] = None,
+    api_url: Optional[str] = None,
+) -> dict:
     """
     Retrieve credentials from environment.
 
@@ -23,7 +28,10 @@ def __get_credentials_from_env(api_key: Optional[str] = None, api_url: Optional[
     return {'api_key': api_key, 'api_url': api_url}
 
 
-def make_request_dispatcher(api_key: Optional[str] = None, api_url: Optional[str] = None) -> Dispatcher:
+def make_request_dispatcher(
+    api_key: Optional[str] = None,
+    api_url: Optional[str] = None,
+) -> Dispatcher:
     """
     Initializes a Dispatcher service.
 

@@ -1,8 +1,11 @@
 from __future__ import annotations
+
 from copy import deepcopy
 from typing import Optional
+
 from connect.client import ConnectClient
 from connect.devops_testing.utils import find_by_id
+
 import datetime
 import json
 import time
@@ -25,32 +28,32 @@ _request_template = {
             "id": "PRD-000-000-000",
             "name": "Product Name",
             "icon": "/media/VA-000-000/PRD-000-000-000/media/PRD-000-000-000-logo_qwerty.png",
-            "status": "published"
+            "status": "published",
         },
         "connection": {
             "id": "CT-0000-0000-0000",
             "type": "preview",
             "provider": {
                 "id": "PA-000-000",
-                "name": "ACME Dispatcher"
+                "name": "ACME Dispatcher",
             },
             "vendor": {
                 "id": "VA-000-000",
-                "name": "ACME Vendor"
+                "name": "ACME Vendor",
             },
             "hub": {
                 "id": "HB-0000-0000",
-                "name": "ACME Hub"
-            }
+                "name": "ACME Hub",
+            },
         },
         "contract": {
             "id": "CRD-00000-00000-00000",
-            "name": "ACME Distribution Contract"
+            "name": "ACME Distribution Contract",
         },
         "marketplace": {
             "id": "MP-00000",
             "name": "Worldwide Marketplace",
-            "icon": "/media/PA-000-000/marketplaces/MP-00000/icon.png"
+            "icon": "/media/PA-000-000/marketplaces/MP-00000/icon.png",
         },
         "params": [],
         "tiers": {
@@ -73,11 +76,11 @@ _request_template = {
                             "country_code": "+1",
                             "area_code": "555",
                             "phone_number": "8677089",
-                            "extension": ""
-                        }
-                    }
+                            "extension": "",
+                        },
+                    },
                 },
-                "external_uid": "c64ce252-2c3d-4148-bb5b-24af1584d6c8"
+                "external_uid": "c64ce252-2c3d-4148-bb5b-24af1584d6c8",
             },
             "tier1": {
                 "id": "TA-0-0000-0000-0000",
@@ -98,41 +101,44 @@ _request_template = {
                             "country_code": "+1",
                             "area_code": "555",
                             "phone_number": "8677089",
-                            "extension": ""
-                        }
-                    }
+                            "extension": "",
+                        },
+                    },
                 },
-                "external_uid": "9c0ea6a2-4b10-48c3-abee-433014c3fd73"
-            }
+                "external_uid": "9c0ea6a2-4b10-48c3-abee-433014c3fd73",
+            },
         },
         "items": [],
         "configuration": {
-            "params": []
+            "params": [],
         },
         "events": {
             "created": {
-                "at": datetime.datetime.now().astimezone().replace(microsecond=0).isoformat()
+                "at": datetime.datetime.now().astimezone().replace(microsecond=0).isoformat(),
             },
             "updated": {
-                "at": datetime.datetime.now().astimezone().replace(microsecond=0).isoformat()
-            }
-        }
+                "at": datetime.datetime.now().astimezone().replace(microsecond=0).isoformat(),
+            },
+        },
     },
     "contract": {
         "id": "CRD-00000-00000-00000",
-        "name": "ACME Distribution Contract"
+        "name": "ACME Distribution Contract",
     },
     "marketplace": {
         "id": "MP-00000",
         "name": "Worldwide Marketplace",
-        "icon": "/media/PA-00-00/marketplaces/MP-00000/icon.png"
+        "icon": "/media/PA-00-00/marketplaces/MP-00000/icon.png",
     },
-    "assignee": ""
+    "assignee": "",
 }
 
 
 class Builder:
-    def __init__(self, request: Optional[dict] = None):
+    def __init__(
+        self,
+        request: Optional[dict] = None,
+    ):
         if request is None:
             request = _request_template
 
@@ -163,15 +169,25 @@ class Builder:
         self._request['asset']['status'] = asset_status
         return self
 
-    def with_asset_product(self, product_id: str, name: str, status: str = 'published') -> Builder:
+    def with_asset_product(
+        self,
+        product_id: str,
+        name: str,
+        status: str = 'published',
+    ) -> Builder:
         self._request['asset']['product'].update({
             "id": product_id,
             "name": name,
-            "status": status
+            "status": status,
         })
         return self
 
-    def with_asset_param(self, param_id: str, value: str = '', value_error: str = '') -> Builder:
+    def with_asset_param(
+        self,
+        param_id: str,
+        value: str = '',
+        value_error: str = '',
+    ) -> Builder:
         param = find_by_id(self._request['asset']['params'], param_id)
         if param is None:
             param = {
@@ -184,13 +200,20 @@ class Builder:
         param.update({
             "name": param_id,
             "value": value,
-            "value_error": value_error
+            "value_error": value_error,
         })
         return self
 
-    def with_asset_item(self, item_id: str, item_mpn: str, quantity: str = '1', old_quantity: str = '0',
-                        item_type: str = 'Reservation', period: str = 'Yearly', unit: str = 'Licenses'
-                        ) -> Builder:
+    def with_asset_item(
+        self,
+        item_id: str,
+        item_mpn: str,
+        quantity: str = '1',
+        old_quantity: str = '0',
+        item_type: str = 'Reservation',
+        period: str = 'Yearly',
+        unit: str = 'Licenses',
+    ) -> Builder:
         item = find_by_id(self._request['asset']['items'], item_id)
         if item is None:
             item = {'id': item_id}
@@ -203,11 +226,16 @@ class Builder:
             "params": [],
             "item_type": item_type,
             "period": period,
-            "type": unit
+            "type": unit,
         })
         return self
 
-    def with_asset_item_param(self, item_id: str, param_id: str, value: str = '') -> Builder:
+    def with_asset_item_param(
+        self,
+        item_id: str,
+        param_id: str,
+        value: str = '',
+    ) -> Builder:
         item = find_by_id(self._request['asset']['items'], item_id)
         param = find_by_id(item['params'], param_id)
         if param is None:
@@ -219,13 +247,18 @@ class Builder:
                 'constraints': {},
                 'events': {},
                 'scope': 'item',
-                'phase': 'configuration'
+                'phase': 'configuration',
             }
             item['params'].append(param)
         param.update({"value": value})
         return self
 
-    def with_asset_configuration_param(self, param_id: str, value: str = '', value_error: str = '') -> Builder:
+    def with_asset_configuration_param(
+        self,
+        param_id: str,
+        value: str = '',
+        value_error: str = '',
+    ) -> Builder:
         param = find_by_id(self._request['asset']['configuration']['params'], param_id)
         if param is None:
             param = {
@@ -238,7 +271,7 @@ class Builder:
         param.update({
             "name": param_id,
             "value": value,
-            "value_error": value_error
+            "value_error": value_error,
         })
         return self
 
@@ -254,7 +287,7 @@ class Dispatcher:
     def init(cls, api_key: str, api_url: str) -> Dispatcher:
         return cls(client=ConnectClient(
             api_key=api_key,
-            endpoint=api_url
+            endpoint=api_url,
         ))
 
     def _create_request(self, request) -> str:
@@ -275,5 +308,5 @@ class Dispatcher:
         return self._fetch_processed_request(
             request_id=self._create_request(request),
             timeout=timeout,
-            max_attempt=max_attempt
+            max_attempt=max_attempt,
         )
