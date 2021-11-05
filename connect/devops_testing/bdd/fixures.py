@@ -1,5 +1,6 @@
 from behave.runner import Context
-from connect.devops_testing.fixures import make_request_dispatcher, make_request_builder
+
+from connect.devops_testing.fixures import make_request_builder, make_request_dispatcher
 
 
 def use_connect_request_dispatcher(context: Context):

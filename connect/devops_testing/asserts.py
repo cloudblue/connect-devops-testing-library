@@ -1,4 +1,5 @@
 import operator
+
 from connect.devops_testing.utils import find_by_id
 
 __operators = {
@@ -8,7 +9,7 @@ __operators = {
     '<=': operator.ge,
     '>': operator.lt,
     '>=': operator.le,
-    'in': operator.contains
+    'in': operator.contains,
 }
 
 
