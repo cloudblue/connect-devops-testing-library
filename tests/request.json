@@ -1,0 +1,177 @@
+{
+  "id": "PR-7658-9572-0778-001",
+  "type": "purchase",
+  "created": "2020-05-21T08:19:37+00:00",
+  "updated": "2020-05-21T08:19:37+00:00",
+  "status": "pending",
+  "activation_key": "",
+  "reason": "",
+  "note": "",
+  "asset": {
+    "id": "AS-7658-9572-0778",
+    "status": "processing",
+    "external_id": "6MDYM711YX",
+    "external_uid": "2e52d249-cdb5-4222-b4cd-67db499f2699",
+    "product": {
+      "id": "PRD-387-522-630",
+      "name": "Demo Product 001",
+      "icon": "/media/VA-610-138/PRD-387-522-630/media/PRD-387-522-630-logo_phTXqIk.png",
+      "status": "published"
+    },
+    "connection": {
+      "id": "CT-0000-0000-0000",
+      "type": "preview",
+      "provider": {
+        "id": "PA-855-748",
+        "name": "CB Demo Staging Provider"
+      },
+      "vendor": {
+        "id": "VA-610-138",
+        "name": "Demo Team Vendor"
+      },
+      "hub": {
+        "id": "HB-0000-0000",
+        "name": "ACME Hub"
+      }
+    },
+    "contract": {
+      "id": "CRD-00000-00000-00000",
+      "name": "ACME Distribution Contract"
+    },
+    "marketplace": {
+      "id": "MP-71206",
+      "name": "Worldwide Marketplace",
+      "icon": "/media/PA-855-748/marketplaces/MP-71206/icon.png"
+    },
+    "params": [
+      {
+        "id": "UNIQUE_PURCHASE_ORDER_IDENTIFIER",
+        "name": "Unique purchase order identifier",
+        "title": "SO Number (Unique Sales Order Identifier)",
+        "description": "Please Provide Unique Sales Order Identifier",
+        "type": "text",
+        "value": "",
+        "value_error": ""
+      }
+    ],
+    "tiers": {
+      "customer": {
+        "id": "TA-8757-7142-2923",
+        "external_id": "88788",
+        "name": "Macejkovic - Osinski",
+        "contact_info": {
+          "address_line1": "Green Land",
+          "address_line2": "Anya Way",
+          "country": "US",
+          "state": "Alabama",
+          "city": "Baldwin",
+          "postal_code": "36507",
+          "contact": {
+            "first_name": "Rod",
+            "last_name": "Runte",
+            "email": "customer+sample@ingrammicro.com",
+            "phone_number": {
+              "country_code": "+1",
+              "area_code": "555",
+              "phone_number": "8677089",
+              "extension": ""
+            }
+          }
+        },
+        "external_uid": "c64ce252-2c3d-4148-bb5b-24af1584d6c8"
+      },
+      "tier1": {
+        "id": "TA-0-2765-9792-6632",
+        "external_id": "92164",
+        "name": "Kilback - Terry",
+        "contact_info": {
+          "address_line1": "Beer Fall",
+          "address_line2": "Mohr Hollow",
+          "country": "US",
+          "state": "Alabama",
+          "city": "Baldwin",
+          "postal_code": "36507",
+          "contact": {
+            "first_name": "Hillard",
+            "last_name": "Bernier",
+            "email": "tier-one+sample@ingrammicro.com",
+            "phone_number": {
+              "country_code": "+1",
+              "area_code": "555",
+              "phone_number": "8677089",
+              "extension": ""
+            }
+          }
+        },
+        "external_uid": "9c0ea6a2-4b10-48c3-abee-433014c3fd73"
+      }
+    },
+    "items": [
+      {
+        "id": "DEMO_BUSINESS_PRO_EDITION_SEATS",
+        "mpn": "DEMO_BUSINESS_PRO_EDITION_SEATS",
+        "quantity": "7",
+        "old_quantity": "0",
+        "params": [
+          {
+            "id": "PLAN_ID",
+            "title": "Plan Identifier",
+            "description": "Plan Identifier",
+            "type": "text",
+            "value": "16ec0f63-b448-487c-885e-8d8d372e24ed",
+            "constraints": {
+              "required": false,
+              "hidden": false,
+              "unique": false
+            },
+            "events": {
+              "created": {
+                "at": "2020-05-19T08:30:01+00:00",
+                "by": {
+                  "id": "UR-291-528-636",
+                  "name": "operator"
+                }
+              },
+              "updated": {
+                "at": "2020-05-20T08:57:36+00:00",
+                "by": {
+                  "id": "UR-291-528-636",
+                  "name": "operator"
+                }
+              }
+            },
+            "scope": "item",
+            "phase": "configuration"
+          }
+        ],
+        "display_name": "Demo Business Pro Edition - Seats",
+        "global_id": "PRD-387-522-630-0003",
+        "item_type": "Reservation",
+        "period": "Yearly",
+        "type": "Licenses"
+      }
+    ],
+    "configuration": {
+      "params": []
+    },
+    "events": {
+      "created": {
+        "at": "2020-05-21T08:19:37+00:00"
+      },
+      "updated": {
+        "at": "2020-05-21T08:19:37+00:00"
+      }
+    }
+  },
+  "contract": {
+    "id": "CRD-00000-00000-00000",
+    "name": "ACME Distribution Contract"
+  },
+  "marketplace": {
+    "id": "MP-71206",
+    "name": "Worldwide Marketplace",
+    "icon": "/media/PA-855-748/marketplaces/MP-71206/icon.png"
+  },
+  "assignee": ""
+}
+

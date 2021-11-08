@@ -136,8 +136,8 @@ _request_template = {
 
 class Builder:
     def __init__(
-        self,
-        request: Optional[dict] = None,
+            self,
+            request: Optional[dict] = None,
     ):
         if request is None:
             request = _request_template
@@ -170,10 +170,10 @@ class Builder:
         return self
 
     def with_asset_product(
-        self,
-        product_id: str,
-        name: str,
-        status: str = 'published',
+            self,
+            product_id: str,
+            name: str,
+            status: str = 'published',
     ) -> Builder:
         self._request['asset']['product'].update({
             "id": product_id,
@@ -183,10 +183,10 @@ class Builder:
         return self
 
     def with_asset_param(
-        self,
-        param_id: str,
-        value: str = '',
-        value_error: str = '',
+            self,
+            param_id: str,
+            value: str = '',
+            value_error: str = '',
     ) -> Builder:
         param = find_by_id(self._request['asset']['params'], param_id)
         if param is None:
@@ -205,14 +205,14 @@ class Builder:
         return self
 
     def with_asset_item(
-        self,
-        item_id: str,
-        item_mpn: str,
-        quantity: str = '1',
-        old_quantity: str = '0',
-        item_type: str = 'Reservation',
-        period: str = 'Yearly',
-        unit: str = 'Licenses',
+            self,
+            item_id: str,
+            item_mpn: str,
+            quantity: str = '1',
+            old_quantity: str = '0',
+            item_type: str = 'Reservation',
+            period: str = 'Yearly',
+            unit: str = 'Licenses',
     ) -> Builder:
         item = find_by_id(self._request['asset']['items'], item_id)
         if item is None:
@@ -231,10 +231,10 @@ class Builder:
         return self
 
     def with_asset_item_param(
-        self,
-        item_id: str,
-        param_id: str,
-        value: str = '',
+            self,
+            item_id: str,
+            param_id: str,
+            value: str = '',
     ) -> Builder:
         item = find_by_id(self._request['asset']['items'], item_id)
         param = find_by_id(item['params'], param_id)
@@ -254,10 +254,10 @@ class Builder:
         return self
 
     def with_asset_configuration_param(
-        self,
-        param_id: str,
-        value: str = '',
-        value_error: str = '',
+            self,
+            param_id: str,
+            value: str = '',
+            value_error: str = '',
     ) -> Builder:
         param = find_by_id(self._request['asset']['configuration']['params'], param_id)
         if param is None:
@@ -282,13 +282,6 @@ class Builder:
 class Dispatcher:
     def __init__(self, client: ConnectClient):
         self._client = client
-
-    @classmethod
-    def init(cls, api_key: str, api_url: str) -> Dispatcher:
-        return cls(client=ConnectClient(
-            api_key=api_key,
-            endpoint=api_url,
-        ))
 
     def _create_request(self, request) -> str:
         return self._client.requests.create(payload=request).get('id')
