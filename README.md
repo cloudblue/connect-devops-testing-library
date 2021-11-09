@@ -1,6 +1,18 @@
 # Connect DevOps Testing Library
 
+![pyversions](https://img.shields.io/pypi/pyversions/connect-devops-testing-library.svg) [![PyPi Status](https://img.shields.io/pypi/v/connect-devops-testing-library.svg)](https://pypi.org/project/connect-devops-testing-library/) [![Build Status](https://github.com/cloudblue/connect-devops-testing-library/actions/workflows/test.yml/badge.svg)](https://github.com/cloudblue/connect-devops-testing-library/actions/workflows/test.yml) [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=connect-devops-testing-library&metric=alert_status)](https://sonarcloud.io/dashboard?id=connect-devops-testing-library)
+
 Testing library to ease Connect EaaS Processors development.
+
+## Install
+
+`Connect DevOps Testing Library` can be installed from [pypi.org](https://pypi.org/project/connect-devops-testing-library/) using pip:
+
+```bash
+$ pip install connect-devops-testing-library
+```
+
+## Usage
 
 DevOps Testing Library has a small request builder to ease the manipulation of the connect requests during testing:
 
@@ -90,7 +102,7 @@ def test_should_approve_purchase_request_successfully():
 
 Once the request is dispatched the Dispatcher will reload the request again every `10` seconds a maximum of `20` 
 attempts. If the request has not been processed the asserts may fail. The wait time between request reload can be 
-configured directly in the `.provision_request(api_key=, api_url=)` method call.
+configured directly in the `.provision_request(timeout=10, max_attempt=20)` method call.
 
 Obviously, some Connect processors may take a lot of time to process a request, for those type of processors this kind
 of end-to-end test is not suitable.
@@ -145,3 +157,7 @@ def step_impl(context):
 ```
 
 The `@when("subscription request is processed")` is provided by the DevOps Testing Library.
+
+## License
+
+`Connect DevOps Testing Library` is released under the [Apache License Version 2.0](https://www.apache.org/licenses/LICENSE-2.0).
