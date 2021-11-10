@@ -3,7 +3,7 @@ from behave.runner import Context
 
 
 @when("subscription request is processed")
-def step_impl(context: Context):
+def request_is_processed(context: Context):
     """
     Sends the request to Connect API and waits some time so the
     request is processed either by a processor or by manually.
@@ -11,4 +11,4 @@ def step_impl(context: Context):
     :param context: Context
     :return: None
     """
-    context.request = context.connect.provision_request(context.request)
+    context.request = context.connect.provision_request(context.builder.build())
