@@ -75,30 +75,30 @@ def test_should_assert_asset_params_value_contains_error():
     asserts.asset_params_value_contains_error(asset_request, 'ID', 'some')
 
 
-def test_should_assert_tcr_status():
-    asserts.tcr_status(config_request, 'active')
+def test_should_assert_tier_configuration_status():
+    asserts.tier_configuration_status(config_request, 'active')
 
 
-def test_should_assert_tcr_params_value_equal():
-    asserts.tcr_params_value_equal(config_request, 'ID', 'value')
+def test_should_assert_tier_configuration_params_value_equal():
+    asserts.tier_configuration_params_value_equal(config_request, 'ID', 'value')
 
 
-def test_should_assert_tcr_params_value_not_equal():
-    asserts.tcr_params_value_not_equal(config_request, 'ID', 'other')
+def test_should_assert_tier_configuration_params_value_not_equal():
+    asserts.tier_configuration_params_value_not_equal(config_request, 'ID', 'other')
 
 
-def test_should_assert_tcr_params_value_contains():
-    asserts.tcr_params_value_contains(config_request, 'ID', 'value')
+def test_should_assert_tier_configuration_params_value_contains():
+    asserts.tier_configuration_params_value_contains(config_request, 'ID', 'value')
 
 
-def test_should_assert_tcr_params_value_equal_error():
-    asserts.tcr_params_value_equal_error(config_request, 'ID', 'some error')
+def test_should_assert_tier_configuration_params_value_equal_error():
+    asserts.tier_configuration_params_value_equal_error(config_request, 'ID', 'some error')
 
 
-def test_should_assert_tcr_params_value_not_equal_error():
-    asserts.tcr_params_value_not_equal_error(config_request, 'ID', 'other error')
+def test_should_assert_tier_configuration_params_value_not_equal_error():
+    asserts.tier_configuration_params_value_not_equal_error(config_request, 'ID', 'other error')
 
 
-def test_should_assert_tcr_params_value_contains_error():
-    asserts.tcr_params_value_contains_error(config_request, 'ID', 'some error')
-    asserts.tcr_params_value_contains_error(config_request, 'ID', 'some')
+def test_should_assert_tier_configuration_params_value_contains_error():
+    asserts.tier_configuration_params_value_contains_error(config_request, 'ID', 'some error')
+    asserts.tier_configuration_params_value_contains_error(config_request, 'ID', 'some')
