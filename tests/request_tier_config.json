@@ -1,0 +1,129 @@
+{
+  "id": "TCR-625-056-106-001",
+  "type": "setup",
+  "status": "pending",
+  "configuration": {
+    "id": "TC-625-056-106",
+    "name": "Configuration of TA-6038-1114-4700",
+    "account": {
+      "id": "TA-0-2765-9792-6632",
+      "type": "reseller",
+      "name": "Kilback - Terry",
+      "external_id": "92164",
+      "external_uid": "d70633dd-c0a4-4fc5-b9bf-d615fd856f83",
+      "contact_info": {
+        "address_line1": "Beer Fall",
+        "address_line2": "Mohr Hollow",
+        "country": "US",
+        "state": "Alabama",
+        "city": "Baldwin",
+        "postal_code": "36507",
+        "contact": {
+          "first_name": "Hillard",
+          "last_name": "Bernier",
+          "email": "tier-one+sample@ingrammicro.com",
+          "phone_number": {
+            "country_code": "+1",
+            "area_code": "555",
+            "phone_number": "8677089",
+            "extension": ""
+          }
+        }
+      },
+      "tax_id": "XXXXXXX"
+    },
+    "product": {
+      "id": "PRD-521-843-700",
+      "status": "published"
+    },
+    "tier_level": 1,
+    "connection": {
+      "id": "CT-0000-0000-0000",
+      "type": "preview",
+      "provider": {
+        "id": "PA-855-748",
+        "name": "CB Demo Staging Provider"
+      },
+      "vendor": {
+        "id": "VA-610-138",
+        "name": "Demo Team Vendor"
+      },
+      "hub": {
+        "id": "HB-0000-0000",
+        "name": "ACME Hub"
+      }
+    },
+    "params": [
+      {
+        "value": "000000",
+        "title": "Partner Number",
+        "description": "Partner Number",
+        "type": "text",
+        "scope": "tier1",
+        "phase": "ordering",
+        "hint": "Partner Number",
+        "constraints": {
+          "required": false,
+          "hidden": false,
+          "unique": false
+        },
+        "id": "TIER1_MPN"
+      }
+    ],
+    "template": {
+      "id": "TL-432-535-295",
+      "name": "Demo Template"
+    },
+    "status": "active",
+    "configuration": {
+      "params": [
+        {
+          "value": "https://api.myvendor.com",
+          "id": "API_URL",
+          "title": "API URL",
+          "description": "API URL Endpoint",
+          "type": "url",
+          "scope": "product",
+          "phase": "configuration",
+          "constraints": {
+            "required": true,
+            "hidden": false,
+            "unique": false
+          }
+        }
+      ]
+    },
+    "contract": {
+      "id": "CRD-00000-00000-00000",
+      "name": "ACME Distribution Contract"
+    },
+    "marketplace": {
+      "id": "MP-71206",
+      "name": "Worldwide Marketplace",
+      "icon": "/media/PA-855-748/marketplaces/MP-71206/icon.png"
+    }
+  },
+  "params": [
+    {
+      "value": "000000",
+      "title": "Partner Number",
+      "description": "Partner Number",
+      "type": "text",
+      "scope": "tier1",
+      "phase": "ordering",
+      "hint": "Partner Number",
+      "constraints": {
+        "required": false,
+        "hidden": false,
+        "unique": false
+      },
+      "id": "TIER1_MPN"
+    }
+  ],
+  "template": {
+    "id": "TL-432-535-295",
+    "name": "Demo Template"
+  },
+  "environment": "preview",
+  "effective_date": "2021-11-05T13:31:50+00:00"
+}

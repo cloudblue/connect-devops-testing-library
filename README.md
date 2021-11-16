@@ -143,10 +143,11 @@ import os
 
 @given("a new valid email address")
 def step_impl(context):
+    template = os.path.dirname(__file__) + '/request.json'
+    
     context.request = context.builder \
-        .from_file(os.path.dirname(__file__) + '/request.json') \
-        .with_asset_param('CUSTOMER_EMAIL_ADDRESS', 'vincent.vega@gmail.com') \
-        .build()
+        .from_file(template) \
+        .with_asset_param('CUSTOMER_EMAIL_ADDRESS', 'vincent.vega@gmail.com')
 
 
 @then("the subscription id is provided")

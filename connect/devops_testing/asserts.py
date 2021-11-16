@@ -45,9 +45,7 @@ def asset_params_value_not_equal(request: dict, param_id: str, expected: Any):
 
 
 def asset_params_value_contains(request: dict, param_id: str, expected: Any):
-    fn = __operators.get('in')
-    param = find_by_id(request.get('asset', {}).get('params', []), param_id, {})
-    assert fn(expected, param['value'])
+    asset_params_value(request, param_id, 'in', expected)
 
 
 def asset_params_value_error(request: dict, param_id: str, operator: str, expected: Any):
@@ -65,9 +63,7 @@ def asset_params_value_not_equal_error(request: dict, param_id: str, expected: A
 
 
 def asset_params_value_contains_error(request: dict, param_id: str, expected: Any):
-    fn = __operators.get('in')
-    param = find_by_id(request.get('asset', {}).get('params', []), param_id, {})
-    assert fn(param.get('value_error'), expected)
+    asset_params_value_error(request, param_id, 'in', expected)
 
 
 def tcr_status(request: dict, expected: str):
@@ -76,7 +72,11 @@ def tcr_status(request: dict, expected: str):
 
 def tcr_params_value(request: dict, param_id: str, operator: str, expected: Any):
     fn = __operators.get(operator)
-    param = find_by_id(request.get('configuration', {}).get('params', []), param_id, {})
+    param = find_by_id(
+        request.get('params', request.get('configuration', {}).get('params', [])),
+        param_id,
+        {},
+    )
     assert fn(param.get('value'), expected)
 
 
@@ -89,14 +89,16 @@ def tcr_params_value_not_equal(request: dict, param_id: str, expected: Any):
 
 
 def tcr_params_value_contains(request: dict, param_id: str, expected: Any):
-    fn = __operators.get('in')
-    param = find_by_id(request.get('configuration', {}).get('params', []), param_id, {})
-    assert fn(param.get('value'), expected)
+    tcr_params_value(request, param_id, 'in', expected)
 
 
 def tcr_params_value_error(request: dict, param_id: str, operator: str, expected: Any):
     fn = __operators.get(operator)
-    param = find_by_id(request.get('configuration', {}).get('params', []), param_id, {})
+    param = find_by_id(
+        request.get('params', request.get('configuration', {}).get('params', [])),
+        param_id,
+        {},
+    )
     assert fn(param.get('value_error'), expected)
 
 
@@ -109,6 +111,4 @@ def tcr_params_value_not_equal_error(request: dict, param_id: str, expected: Any
 
 
 def tcr_params_value_contains_error(request: dict, param_id: str, expected: Any):
-    fn = __operators.get('in')
-    param = find_by_id(request.get('configuration', {}).get('params', []), param_id, {})
-    assert fn(param.get('value_error'), expected)
+    tcr_params_value_error(request, param_id, 'in', expected)
