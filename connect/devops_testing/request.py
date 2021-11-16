@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from abc import ABCMeta, abstractmethod
+from abc import abstractmethod
 from copy import deepcopy
-from typing import Optional, Type
+from typing import Optional
 
 from connect.client import ConnectClient
-from connect.devops_testing.utils import find_by_id, merge, request_model
+from connect.devops_testing.utils import find_by_id, merge, request_model, request_parameters
 
 import json
 import time
@@ -171,24 +171,28 @@ class Builder:
         self._request = merge(self._request, {'asset': {'marketplace': {'id': marketplace_id}}})
         return self
 
-    def with_asset_param(self, param_id: str, value: str = '', value_error: str = '') -> Builder:
+    def with_asset_param(
+            self,
+            param_id: str,
+            value: Optional[str] = None,
+            value_error: Optional[str] = None,
+    ) -> Builder:
         param = find_by_id(self._request.get('asset', {}).get('params', []), param_id)
 
         if param is None:
             param = {
                 'id': param_id,
+                'name': param_id,
                 'title': f'Asset parameter {param_id}',
                 'description': f'Asset parameter description of {param_id}',
                 'type': 'text',
+                'value': '',
+                'value_error': '',
             }
             self._request = merge(self._request, {'asset': {'params': [param]}})
 
-        param.update({
-            "name": param_id,
-            "value": value,
-            "value_error": value_error,
-        })
-
+        values = {'value': value, 'value_error': value_error}
+        param.update({k: v for k, v in values.items() if v is not None})
         return self
 
     def with_asset_item(
@@ -200,6 +204,7 @@ class Builder:
             item_type: str = 'Reservation',
             period: str = 'Yearly',
             unit: str = 'Licenses',
+            display_name: Optional[str] = None,
     ) -> Builder:
         item = find_by_id(self._request.get('asset', {}).get('items', []), item_id)
         if item is None:
@@ -207,15 +212,15 @@ class Builder:
             self._request = merge(self._request, {'asset': {'items': [item]}})
 
         item.update({
-            "mpn": item_mpn,
-            "quantity": quantity,
-            "old_quantity": old_quantity,
-            "params": [],
-            "item_type": item_type,
-            "period": period,
-            "type": unit,
+            'display_name': item_id if display_name is None else display_name,
+            'mpn': item_mpn,
+            'quantity': quantity,
+            'old_quantity': old_quantity,
+            'params': [],
+            'item_type': item_type,
+            'period': period,
+            'type': unit,
         })
-
         return self
 
     def with_asset_item_param(self, item_id: str, param_id: str, value: str = '') -> Builder:
@@ -232,29 +237,32 @@ class Builder:
                 'type': 'text',
                 'scope': 'item',
                 'phase': 'configuration',
+                'value': '',
             }
             item['params'].append(param)
 
-        param.update({"value": value})
+        param.update({'value': value})
         return self
 
-    def with_asset_configuration_param(self, param_id: str, value: str = '', value_error: str = '') -> Builder:
+    def with_asset_configuration_param(
+            self,
+            param_id: str,
+            value: Optional[str] = None,
+            value_error: Optional[str] = None,
+    ) -> Builder:
         param = find_by_id(self._request.get('asset', {}).get('configuration', {}).get('params', []), param_id)
         if param is None:
             param = {
                 'id': param_id,
+                'name': param_id,
                 'title': f'Asset configuration parameter {param_id}',
                 'description': f'Asset configuration parameter Description of {param_id}',
                 'type': 'text',
             }
             self._request = merge(self._request, {'asset': {'configuration': {'params': [param]}}})
 
-        param.update({
-            "name": param_id,
-            "value": value,
-            "value_error": value_error,
-        })
-
+        values = {'value': value, 'value_error': value_error}
+        param.update({k: v for k, v in values.items() if v is not None})
         return self
 
     def with_tier_configuration_id(self, tier_configuration_id: str) -> Builder:
@@ -281,7 +289,11 @@ class Builder:
         self._request = merge(self._request, {'configuration': {'tier_level': level}})
         return self
 
-    def with_tier_configuration_param(self, param_id: str, value: str = '', value_error: str = '') -> Builder:
+    def with_tier_configuration_param(
+            self, param_id: str,
+            value: Optional[str] = None,
+            value_error: Optional[str] = None,
+    ) -> Builder:
         locations = [
             (
                 lambda request: request.get('configuration', {}).get('params', []),
@@ -298,17 +310,17 @@ class Builder:
             if param is None:
                 param = {
                     'id': param_id,
+                    'name': param_id,
                     'title': f'Asset parameter {param_id}',
                     'description': f'Asset parameter description of {param_id}',
                     'type': 'text',
+                    'value': '',
+                    'value_error': '',
                 }
                 self._request = merge(self._request, location[1](param))
 
-            param.update({
-                "name": param_id,
-                "value": value,
-                "value_error": value_error,
-            })
+            values = {'value': value, 'value_error': value_error}
+            param.update({k: v for k, v in values.items() if v is not None})
 
         return self
 
@@ -322,16 +334,16 @@ class Builder:
 class Dispatcher:
     def __init__(self, client: ConnectClient):
         self._handlers = [
-            _AssetRequestHandler(client, 'asset'),
-            _TierConfigRequestHandler(client, 'tier-config'),
+            _AssetRequestRepository(client, 'asset'),
+            _TierConfigRequestRepository(client, 'tier-config'),
         ]
 
-    def _get_request_handler(self, request: dict) -> Optional[Type[_RequestHandler]]:
+    def _get_request_handler(self, request: dict) -> Optional[_RequestRepository]:
         filtered = list(filter(lambda handler: handler.is_type_valid(request), self._handlers))
         return filtered[0] if filtered else None
 
-    def _create_request(self, request) -> dict:
-        return self._get_request_handler(request).create(request)
+    def _save_request(self, request) -> dict:
+        return self._get_request_handler(request).save(request)
 
     def _fetch_processed_request(self, request: dict, timeout: int, max_attempt: int) -> dict:
         finder = self._get_request_handler(request)
@@ -357,13 +369,13 @@ class Dispatcher:
         :return: dict The processed request.
         """
         return self._fetch_processed_request(
-            request=self._create_request(request),
+            request=self._save_request(request),
             timeout=timeout,
             max_attempt=max_attempt,
         )
 
 
-class _RequestHandler(metaclass=ABCMeta):
+class _RequestRepository:
     def __init__(self, client: ConnectClient, model: str):
         self._client = client
         self._model = model
@@ -373,30 +385,82 @@ class _RequestHandler(metaclass=ABCMeta):
 
     @abstractmethod
     def find(self, request_id: str) -> dict:  # pragma: no cover
-        pass
+        """
+        Find a request by id.
+
+        :param request_id: str The request id
+        :return: dict The request dictionary
+        """
 
     @abstractmethod
-    def create(self, request: dict) -> dict:  # pragma: no cover
-        pass
+    def save(self, request: dict) -> dict:  # pragma: no cover
+        """
+        Save (create/update) the request into the Connect Platform.
+
+        :param request: dict The request to create/update.
+        :return: dict The request dictionary
+        """
 
 
-class _AssetRequestHandler(_RequestHandler):
+class _AssetRequestRepository(_RequestRepository):
     def find(self, request_id: str) -> dict:
         return self._client.requests[request_id].get()
 
-    def create(self, request: dict) -> dict:
+    def save(self, request: dict) -> dict:
         shortcut = self._client.requests
-        return request if request.get('id') else shortcut.create(
-            payload=request,
-        )
+        if request.get('id') is None:
+            request = shortcut.create(
+                payload=request,
+            )
+
+        else:
+            current = self.find(request.get('id'))
+            params = zip(
+                request_parameters(current.get('asset', {}).get('params', [])),
+                request_parameters(request.get('asset', {}).get('params', [])),
+            )
+
+            difference = [new for cur, new in params if cur != new]
+            if len(difference) > 0:
+                if current.get('status') == 'inquiring':
+                    shortcut[request.get('id')].action('pend').post()
+
+                request = shortcut[request.get('id')].update(
+                    payload={
+                        'asset': {'params': difference},
+                    },
+                )
+
+        return request
 
 
-class _TierConfigRequestHandler(_RequestHandler):
+class _TierConfigRequestRepository(_RequestRepository):
     def find(self, request_id: str) -> dict:
         return self._client.ns('tier').config_requests[request_id].get()
 
-    def create(self, request: dict) -> dict:
+    def save(self, request: dict) -> dict:
         shortcut = self._client.ns('tier').config_requests
-        return request if request.get('id') else shortcut.create(
-            payload=request,
-        )
+        if request.get('id') is None:
+            request = shortcut.create(
+                payload=request,
+            )
+
+        else:
+            current = self.find(request.get('id'))
+            params = zip(
+                request_parameters(current.get('params', [])),
+                request_parameters(request.get('params', [])),
+            )
+
+            difference = [new for cur, new in params if cur != new]
+            if len(difference) > 0:
+                if current.get('status') == 'inquiring':
+                    shortcut[request.get('id')].action('pend').post()
+
+                request = shortcut[request.get('id')].update(
+                    payload={
+                        'params': difference,
+                    },
+                )
+
+        return request

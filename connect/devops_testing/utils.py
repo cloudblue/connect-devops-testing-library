@@ -56,14 +56,15 @@ def request_model(request: dict) -> str:
 def request_parameters(params: List[dict]) -> List[dict]:
     """
     Map the given parameters, providing only the mutable keys.
-    :param params: dict
-    :return: dict
+
+    :param params: dict The list of parameters.
+    :return: dict The mapped list of parameters.
     """
     return list(map(
         lambda param: {
             'id': param.get('id'),
-            'value': param.get('value'),
-            'value_error': param.get('value_error'),
+            'value': param.get('value', ''),
+            'value_error': param.get('value_error', ''),
         },
         params,
     ))
