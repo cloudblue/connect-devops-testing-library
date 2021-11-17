@@ -1,4 +1,4 @@
-from connect.devops_testing import fixures
+from connect.devops_testing import fixtures
 from connect.devops_testing.request import Builder
 
 import pytest
@@ -15,7 +15,7 @@ def test_request_builder_should_fail_building_request_with_wrong_template_type()
 
 
 def test_request_builder_should_use_default_asset_template():
-    request = (fixures.make_request_builder()
+    request = (fixtures.make_request_builder()
                .from_default_asset()
                .build())
 
@@ -23,7 +23,7 @@ def test_request_builder_should_use_default_asset_template():
 
 
 def test_request_builder_should_use_default_tier_config_template():
-    request = (fixures.make_request_builder()
+    request = (fixtures.make_request_builder()
                .from_default_tier_config()
                .build())
 
@@ -32,12 +32,12 @@ def test_request_builder_should_use_default_tier_config_template():
 
 def test_request_builder_should_raise_exception_on_adding_parameter_to_missing_asset_item():
     with pytest.raises(ValueError):
-        (fixures.make_request_builder()
+        (fixtures.make_request_builder()
          .with_asset_item_param('MISSING', 'PARAM_ID', 'The value'))
 
 
 def test_request_builder_should_build_successfully_a_valid_asset_request():
-    request = (fixures.make_request_builder()
+    request = (fixtures.make_request_builder()
                .with_type('purchase')
                .with_status('approved')
                .with_id('PR-0000-0000-0000-100')
@@ -94,7 +94,7 @@ def test_request_builder_should_build_successfully_a_valid_asset_request():
 
 
 def test_request_builder_should_build_successfully_a_valid_tier_config_request():
-    request = (fixures.make_request_builder()
+    request = (fixtures.make_request_builder()
                .with_type('setup')
                .with_status('approved')
                .with_id('TCR-000-000-000-100')
@@ -153,7 +153,7 @@ def test_request_builder_should_build_successfully_a_valid_tier_config_request()
 def test_request_builder_should_build_successfully_a_valid_request_from_file_template():
     template = os.path.dirname(__file__) + TPL_REQUEST_ASSET
 
-    request = (fixures.make_request_builder(template)
+    request = (fixtures.make_request_builder(template)
                .build())
 
     assert request['id'] == 'PR-7658-9572-0778-001'
@@ -167,7 +167,7 @@ def test_request_builder_should_build_successfully_a_valid_request_from_file_tem
 def test_request_dispatcher_should_create_successfully_a_asset_request(sync_client_factory, response_factory):
     template = os.path.dirname(__file__) + TPL_REQUEST_ASSET
 
-    request = fixures.make_request_builder(template)
+    request = fixtures.make_request_builder(template)
 
     to_create = (request
                  .without('id')
@@ -186,7 +186,7 @@ def test_request_dispatcher_should_create_successfully_a_asset_request(sync_clie
         response_factory(value=approved),  # request.get (second call)
     ])
 
-    request = (fixures.make_request_dispatcher(client=connect_client)
+    request = (fixtures.make_request_dispatcher(client=connect_client)
                .provision_request(request=to_create, timeout=0, max_attempt=1))
 
     assert isinstance(request, dict)
@@ -195,7 +195,7 @@ def test_request_dispatcher_should_create_successfully_a_asset_request(sync_clie
 def test_request_dispatcher_should_update_successfully_a_asset_request(sync_client_factory, response_factory):
     template = os.path.dirname(__file__) + TPL_REQUEST_ASSET
 
-    request = fixures.make_request_builder(template)
+    request = fixtures.make_request_builder(template)
 
     on_server = (request
                  .with_status('inquiring')
@@ -219,7 +219,7 @@ def test_request_dispatcher_should_update_successfully_a_asset_request(sync_clie
         response_factory(value=approved),  # request.get (second call)
     ])
 
-    request = (fixures.make_request_dispatcher(client=connect_client)
+    request = (fixtures.make_request_dispatcher(client=connect_client)
                .provision_request(request=to_update, timeout=0, max_attempt=1))
 
     assert request['asset']['params'][0]['value'] == 'SOME_VALID_VALUE'
@@ -228,7 +228,7 @@ def test_request_dispatcher_should_update_successfully_a_asset_request(sync_clie
 def test_request_dispatcher_should_avoid_update_a_unchanged_asset_request(sync_client_factory, response_factory):
     template = os.path.dirname(__file__) + TPL_REQUEST_ASSET
 
-    request = fixures.make_request_builder(template)
+    request = fixtures.make_request_builder(template)
 
     on_server = request.build()
 
@@ -246,7 +246,7 @@ def test_request_dispatcher_should_avoid_update_a_unchanged_asset_request(sync_c
         response_factory(value=approved),  # request.get (second call)
     ])
 
-    request = (fixures.make_request_dispatcher(client=connect_client)
+    request = (fixtures.make_request_dispatcher(client=connect_client)
                .provision_request(request=to_update, timeout=0, max_attempt=1))
 
     assert request['asset']['params'][0]['value'] == ''
@@ -255,7 +255,7 @@ def test_request_dispatcher_should_avoid_update_a_unchanged_asset_request(sync_c
 def test_request_dispatcher_should_create_successfully_a_tier_config_request(sync_client_factory, response_factory):
     template = os.path.dirname(__file__) + TPL_REQUEST_TIER_CONFIG
 
-    request = fixures.make_request_builder(template)
+    request = fixtures.make_request_builder(template)
 
     to_create = (request
                  .without('id')
@@ -274,7 +274,7 @@ def test_request_dispatcher_should_create_successfully_a_tier_config_request(syn
         response_factory(value=approved),  # tier.config_request.get (second call)
     ])
 
-    request = (fixures.make_request_dispatcher(client=connect_client)
+    request = (fixtures.make_request_dispatcher(client=connect_client)
                .provision_request(request=to_create, timeout=0, max_attempt=1))
 
     assert isinstance(request, dict)
@@ -283,7 +283,7 @@ def test_request_dispatcher_should_create_successfully_a_tier_config_request(syn
 def test_request_dispatcher_should_update_successfully_a_tier_config_request(sync_client_factory, response_factory):
     template = os.path.dirname(__file__) + TPL_REQUEST_TIER_CONFIG
 
-    request = fixures.make_request_builder(template)
+    request = fixtures.make_request_builder(template)
 
     on_server = (request
                  .with_status('inquiring')
@@ -307,7 +307,7 @@ def test_request_dispatcher_should_update_successfully_a_tier_config_request(syn
         response_factory(value=approved),  # tier.config_request.get (second call)
     ])
 
-    request = (fixures.make_request_dispatcher(client=connect_client)
+    request = (fixtures.make_request_dispatcher(client=connect_client)
                .provision_request(request=to_update, timeout=0, max_attempt=1))
 
     assert isinstance(request, dict)
@@ -317,7 +317,7 @@ def test_request_dispatcher_should_update_successfully_a_tier_config_request(syn
 def test_request_dispatcher_should_avoid_update_a_unchanged_tier_config_request(sync_client_factory, response_factory):
     template = os.path.dirname(__file__) + TPL_REQUEST_TIER_CONFIG
 
-    request = fixures.make_request_builder(template)
+    request = fixtures.make_request_builder(template)
 
     on_server = request.build()
 
@@ -335,7 +335,7 @@ def test_request_dispatcher_should_avoid_update_a_unchanged_tier_config_request(
         response_factory(value=approved),  # tier.config_request.get (second call)
     ])
 
-    request = (fixures.make_request_dispatcher(client=connect_client)
+    request = (fixtures.make_request_dispatcher(client=connect_client)
                .provision_request(request=to_update, timeout=0, max_attempt=1))
 
     assert request['configuration']['params'][0]['value'] == '000000'
