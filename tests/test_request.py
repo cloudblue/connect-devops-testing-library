@@ -5,6 +5,9 @@ import pytest
 
 import os
 
+TPL_REQUEST_ASSET = '/request_asset.json'
+TPL_REQUEST_TIER_CONFIG = '/request_tier_config.json'
+
 
 def test_request_builder_should_fail_building_request_with_wrong_template_type():
     with pytest.raises(ValueError):
@@ -148,7 +151,7 @@ def test_request_builder_should_build_successfully_a_valid_tier_config_request()
 
 
 def test_request_builder_should_build_successfully_a_valid_request_from_file_template():
-    template = os.path.dirname(__file__) + '/request_asset.json'
+    template = os.path.dirname(__file__) + TPL_REQUEST_ASSET
 
     request = (fixures.make_request_builder(template)
                .build())
@@ -162,7 +165,7 @@ def test_request_builder_should_build_successfully_a_valid_request_from_file_tem
 
 
 def test_request_dispatcher_should_create_successfully_a_asset_request(sync_client_factory, response_factory):
-    template = os.path.dirname(__file__) + '/request_asset.json'
+    template = os.path.dirname(__file__) + TPL_REQUEST_ASSET
 
     request = fixures.make_request_builder(template)
 
@@ -190,11 +193,13 @@ def test_request_dispatcher_should_create_successfully_a_asset_request(sync_clie
 
 
 def test_request_dispatcher_should_update_successfully_a_asset_request(sync_client_factory, response_factory):
-    template = os.path.dirname(__file__) + '/request_asset.json'
+    template = os.path.dirname(__file__) + TPL_REQUEST_ASSET
 
     request = fixures.make_request_builder(template)
 
-    on_server = request.build()
+    on_server = (request
+                 .with_status('inquiring')
+                 .build())
 
     to_update = (request
                  .with_asset_param('UNIQUE_PURCHASE_ORDER_IDENTIFIER', 'SOME_VALID_VALUE')
@@ -208,6 +213,7 @@ def test_request_dispatcher_should_update_successfully_a_asset_request(sync_clie
 
     connect_client = sync_client_factory([
         response_factory(value=on_server),  # request.get (to compare)
+        response_factory(status=204),  # request.update (set to pending)
         response_factory(value=to_update),  # request.update (update params)
         response_factory(value=to_update),  # request.get (first call)
         response_factory(value=approved),  # request.get (second call)
@@ -216,11 +222,38 @@ def test_request_dispatcher_should_update_successfully_a_asset_request(sync_clie
     request = (fixures.make_request_dispatcher(client=connect_client)
                .provision_request(request=to_update, timeout=0, max_attempt=1))
 
-    assert isinstance(request, dict)
+    assert request['asset']['params'][0]['value'] == 'SOME_VALID_VALUE'
+
+
+def test_request_dispatcher_should_avoid_update_a_unchanged_asset_request(sync_client_factory, response_factory):
+    template = os.path.dirname(__file__) + TPL_REQUEST_ASSET
+
+    request = fixures.make_request_builder(template)
+
+    on_server = request.build()
+
+    to_update = (request
+                 .build())
+
+    approved = (request
+                .with_status('approved')
+                .with_asset_status('active')
+                .build())
+
+    connect_client = sync_client_factory([
+        response_factory(value=on_server),  # request.get (to compare)
+        response_factory(value=to_update),  # request.get (first call)
+        response_factory(value=approved),  # request.get (second call)
+    ])
+
+    request = (fixures.make_request_dispatcher(client=connect_client)
+               .provision_request(request=to_update, timeout=0, max_attempt=1))
+
+    assert request['asset']['params'][0]['value'] == ''
 
 
 def test_request_dispatcher_should_create_successfully_a_tier_config_request(sync_client_factory, response_factory):
-    template = os.path.dirname(__file__) + '/request_tier_config.json'
+    template = os.path.dirname(__file__) + TPL_REQUEST_TIER_CONFIG
 
     request = fixures.make_request_builder(template)
 
@@ -248,11 +281,13 @@ def test_request_dispatcher_should_create_successfully_a_tier_config_request(syn
 
 
 def test_request_dispatcher_should_update_successfully_a_tier_config_request(sync_client_factory, response_factory):
-    template = os.path.dirname(__file__) + '/request_tier_config.json'
+    template = os.path.dirname(__file__) + TPL_REQUEST_TIER_CONFIG
 
     request = fixures.make_request_builder(template)
 
-    on_server = request.build()
+    on_server = (request
+                 .with_status('inquiring')
+                 .build())
 
     to_update = (request
                  .with_tier_configuration_param('TIER1_MPN', '111111')
@@ -266,6 +301,7 @@ def test_request_dispatcher_should_update_successfully_a_tier_config_request(syn
 
     connect_client = sync_client_factory([
         response_factory(value=on_server),  # tier.config_request.get (to compare)
+        response_factory(status=204),  # tier.config_request.update (set to pending)
         response_factory(value=to_update),  # tier.config_request.update (update params)
         response_factory(value=to_update),  # tier.config_request.get (first call)
         response_factory(value=approved),  # tier.config_request.get (second call)
@@ -275,3 +311,31 @@ def test_request_dispatcher_should_update_successfully_a_tier_config_request(syn
                .provision_request(request=to_update, timeout=0, max_attempt=1))
 
     assert isinstance(request, dict)
+    assert request['configuration']['params'][0]['value'] == '111111'
+
+
+def test_request_dispatcher_should_avoid_update_a_unchanged_tier_config_request(sync_client_factory, response_factory):
+    template = os.path.dirname(__file__) + TPL_REQUEST_TIER_CONFIG
+
+    request = fixures.make_request_builder(template)
+
+    on_server = request.build()
+
+    to_update = (request
+                 .build())
+
+    approved = (request
+                .with_status('approved')
+                .with_tier_configuration_status('active')
+                .build())
+
+    connect_client = sync_client_factory([
+        response_factory(value=on_server),  # tier.config_request.get (to compare)
+        response_factory(value=to_update),  # tier.config_request.get (first call)
+        response_factory(value=approved),  # tier.config_request.get (second call)
+    ])
+
+    request = (fixures.make_request_dispatcher(client=connect_client)
+               .provision_request(request=to_update, timeout=0, max_attempt=1))
+
+    assert request['configuration']['params'][0]['value'] == '000000'

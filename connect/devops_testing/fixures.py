@@ -12,8 +12,8 @@ __CONNECT_API_URL = 'CONNECT_API_URL'
 def make_request_dispatcher(
         api_key: Optional[str] = None,
         api_url: Optional[str] = None,
-        client: ConnectClient = None,
         use_specs: bool = True,
+        client: ConnectClient = None,
 ) -> Dispatcher:
     """
     Initializes a Dispatcher service.
