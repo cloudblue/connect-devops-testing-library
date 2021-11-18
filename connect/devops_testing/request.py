@@ -137,11 +137,14 @@ class Builder:
         self._request.pop(key, None)
         return self
 
+    def request_type(self) -> str:
+        return request_model(self._request)
+
     def is_asset_request(self) -> bool:
-        return 'asset' == request_model(self._request)
+        return 'asset' == self.request_type()
 
     def is_tier_config_request(self) -> bool:
-        return 'tier-config' == request_model(self._request)
+        return 'tier-config' == self.request_type()
 
     def with_type(self, request_type: str) -> Builder:
         self._request = merge(self._request, {'type': request_type})

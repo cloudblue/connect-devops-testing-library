@@ -1,4 +1,5 @@
 import operator
+import re
 from typing import Any
 
 from connect.devops_testing.utils import find_by_id
@@ -7,6 +8,7 @@ __operators = {
     '==': operator.eq,
     '!=': operator.ne,
     'in': operator.contains,
+    'match': lambda value, pattern: re.search(pattern, value),
 }
 
 
@@ -40,6 +42,10 @@ def asset_params_value_equal(request: dict, param_id: str, expected: Any):
     asset_params_value(request, param_id, '==', expected)
 
 
+def asset_params_value_match(request: dict, param_id: str, pattern: str):
+    asset_params_value(request, param_id, 'match', pattern)
+
+
 def asset_params_value_not_equal(request: dict, param_id: str, expected: Any):
     asset_params_value(request, param_id, '!=', expected)
 
@@ -64,6 +70,10 @@ def asset_params_value_not_equal_error(request: dict, param_id: str, expected: A
 
 def asset_params_value_contains_error(request: dict, param_id: str, expected: Any):
     asset_params_value_error(request, param_id, 'in', expected)
+
+
+def asset_params_value_error_match(request: dict, param_id: str, pattern: str):
+    asset_params_value_error(request, param_id, 'match', pattern)
 
 
 def tier_configuration_status(request: dict, expected: str):
@@ -92,6 +102,10 @@ def tier_configuration_params_value_contains(request: dict, param_id: str, expec
     tier_configuration_params_value(request, param_id, 'in', expected)
 
 
+def tier_configuration_params_value_match(request: dict, param_id: str, pattern: str):
+    tier_configuration_params_value(request, param_id, 'match', pattern)
+
+
 def tier_configuration_params_value_error(request: dict, param_id: str, operator: str, expected: Any):
     fn = __operators.get(operator)
     param = find_by_id(
@@ -112,3 +126,7 @@ def tier_configuration_params_value_not_equal_error(request: dict, param_id: str
 
 def tier_configuration_params_value_contains_error(request: dict, param_id: str, expected: Any):
     tier_configuration_params_value_error(request, param_id, 'in', expected)
+
+
+def tier_configuration_params_value_error_match(request: dict, param_id: str, pattern: str):
+    tier_configuration_params_value_error(request, param_id, 'match', pattern)

@@ -45,12 +45,17 @@ def request_model(request: dict) -> str:
     :param request: dict
     :return: str
     """
-    if request.get('type') in ['adjustment', 'purchase', 'change', 'suspend', 'resume', 'cancel']:
-        return 'asset'
-    elif request.get('type') in ['setup']:
-        return 'tier-config'
-    else:
-        'undefined'
+    filtered = list(filter(lambda model: request.get('type') in model['types'], [
+        {
+            'request': 'asset',
+            'types': ['adjustment', 'purchase', 'change', 'suspend', 'resume', 'cancel'],
+        },
+        {
+            'request': 'tier-config',
+            'types': ['setup'],
+        },
+    ]))
+    return filtered[0].get('request') if filtered else 'undefined'
 
 
 def request_parameters(params: List[dict]) -> List[dict]:

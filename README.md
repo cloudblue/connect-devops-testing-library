@@ -161,7 +161,7 @@ def step_impl(context):
     asserts.asset_params_value_not_equal(context.request, 'CUSTOMER_EMAIL_ADDRESS', '')
 ```
 
-The `@when("subscription request is processed")` is provided by the DevOps Testing Library.
+The `@step("subscription request is processed")` is provided by the DevOps Testing Library.
 
 ## License
 
