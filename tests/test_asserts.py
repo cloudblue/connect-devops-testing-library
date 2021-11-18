@@ -62,6 +62,10 @@ def test_should_assert_asset_params_value_contains():
     asserts.asset_params_value_contains(asset_request, 'ID', 'value')
 
 
+def test_should_assert_asset_params_value_match():
+    asserts.asset_params_value_match(asset_request, 'ID', '^value$')
+
+
 def test_should_assert_asset_params_value_equal_error():
     asserts.asset_params_value_equal_error(asset_request, 'ID', 'some error')
 
@@ -73,6 +77,10 @@ def test_should_assert_asset_params_value_not_equal_error():
 def test_should_assert_asset_params_value_contains_error():
     asserts.asset_params_value_contains_error(asset_request, 'ID', 'some error')
     asserts.asset_params_value_contains_error(asset_request, 'ID', 'some')
+
+
+def test_should_assert_asset_params_value_error_match():
+    asserts.asset_params_value_error_match(asset_request, 'ID', r'^s[\s\w]*r$')
 
 
 def test_should_assert_tier_configuration_status():
@@ -91,6 +99,10 @@ def test_should_assert_tier_configuration_params_value_contains():
     asserts.tier_configuration_params_value_contains(config_request, 'ID', 'value')
 
 
+def test_should_assert_tier_configuration_params_value_match():
+    asserts.tier_configuration_params_value_match(config_request, 'ID', '^value$')
+
+
 def test_should_assert_tier_configuration_params_value_equal_error():
     asserts.tier_configuration_params_value_equal_error(config_request, 'ID', 'some error')
 
@@ -102,3 +114,7 @@ def test_should_assert_tier_configuration_params_value_not_equal_error():
 def test_should_assert_tier_configuration_params_value_contains_error():
     asserts.tier_configuration_params_value_contains_error(config_request, 'ID', 'some error')
     asserts.tier_configuration_params_value_contains_error(config_request, 'ID', 'some')
+
+
+def test_should_assert_tier_configuration_params_value_error_match():
+    asserts.tier_configuration_params_value_error_match(config_request, 'ID', r'^s[\s\w]*r$')

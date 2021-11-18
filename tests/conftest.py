@@ -1,7 +1,10 @@
 from collections import namedtuple
 from collections.abc import Iterable
 from types import MethodType
+from unittest.mock import Mock
 from urllib.parse import parse_qs
+
+from behave.runner import Context
 from connect.client import ConnectClient
 import pytest
 import requests
@@ -138,3 +141,7 @@ def sync_client_factory():
         return client
 
     return _create_sync_client
+
+@pytest.fixture
+def behave_context():
+    return Context(runner=Mock())
