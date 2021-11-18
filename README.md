@@ -18,12 +18,12 @@ $ pip install connect-devops-testing-library
 DevOps Testing Library has a small request builder to ease the manipulation of the connect requests during testing:
 
 ````python
-from connect.devops_testing import fixures
+from connect.devops_testing import fixtures
 import os
 
 template = os.path.dirname(__file__) + '/request.json'
 
-request = (fixures.make_request_builder(template)
+request = (fixtures.make_request_builder(template)
            .with_type('purchase')
            .with_asset_product('PRD-000-000-000', 'Product Name')
            .with_asset_configuration_param('SOME_ASSET_CFG__PARAM_ID_A', 'some_cfg_value_a')
@@ -46,7 +46,7 @@ asserts.asset_params_value_not_equal(request, 'SOME_ASSET_PARAM_ID_001', 'some_e
 Using these two features you can easily create a small test to check a purchase request of your processor:
 
 ```python
-from connect.devops_testing import fixures, asserts
+from connect.devops_testing import fixtures, asserts
 from my_ext.extension import MyExtension
 import os
 
@@ -55,7 +55,7 @@ def test_should_approve_request(mocked_connect_client, mocked_service_client, lo
     template = os.path.dirname(__file__) + '/request.json'
 
     # prepare the request.
-    request = (fixures.make_request_builder(template)
+    request = (fixtures.make_request_builder(template)
                .with_type('purchase')
                .with_status('pending')
                .with_asset_param('subscription_id', '')
@@ -78,7 +78,7 @@ environment variables in `CONNECT_API_KEY` and `CONNECT_API_URL`. Alternatively,
 to the `make_request_dispatcher(api_key=XXX, api_url=YYY)` function. Let's see example:
 
 ```python
-from connect.devops_testing import asserts, fixures
+from connect.devops_testing import asserts, fixtures
 import os
 
 
@@ -86,7 +86,7 @@ def test_should_approve_purchase_request_successfully():
     template = os.path.dirname(__file__) + '/request.json'
 
     # prepare the request.
-    request = (fixures.make_request_builder(template)
+    request = (fixtures.make_request_builder(template)
                .with_type('purchase')
                .with_status('pending')
                .with_asset_param('subscription_id', '')
@@ -94,7 +94,7 @@ def test_should_approve_purchase_request_successfully():
 
     # dispatch the request to connect and wait some time so the 
     # processor can process the request.
-    request = (fixures.make_request_dispatcher()
+    request = (fixtures.make_request_dispatcher()
                .provision_request(request, 10, 20))
 
     # evaluate the processed request.
@@ -114,7 +114,7 @@ Finally, the DevOps Testing Library also allows you to easily use Behave! BDD to
 the following code in your `features/environment.py` file
 
 ```python
-from connect.devops_testing.bdd.fixures import use_connect_request_dispatcher, use_connect_request_builder
+from connect.devops_testing.bdd.fixtures import use_connect_request_dispatcher, use_connect_request_builder
 # import the built-in steps for e2e testing. 
 from connect.devops_testing.bdd import steps
 
