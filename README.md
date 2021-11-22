@@ -40,7 +40,7 @@ from connect.devops_testing import asserts
 
 asserts.request_status(request, 'approved')
 asserts.asset_status(request, 'active')
-asserts.asset_params_value_not_equal(request, 'SOME_ASSET_PARAM_ID_001', 'some_expected_value')
+asserts.asset_param_value_not_equal(request, 'SOME_ASSET_PARAM_ID_001', 'some_expected_value')
 ```
 
 Using these two features you can easily create a small test to check a purchase request of your processor:
@@ -69,7 +69,7 @@ def test_should_approve_request(mocked_connect_client, mocked_service_client, lo
     asserts.task_response_status(result, 'success')
     asserts.request_status(request, 'approved')
     asserts.asset_status(request, 'active')
-    asserts.asset_params_value(request, 'subscription_id', '==', 'ID:123456789')
+    asserts.asset_param_value(request, 'subscription_id', '==', 'ID:123456789')
 ```
 
 Additionally, you may want to create real end-to-end test calling Connect and evaluating the processed request, for this
@@ -100,7 +100,7 @@ def test_should_approve_purchase_request_successfully():
     # evaluate the processed request.
     asserts.request_status(request, 'approved')
     asserts.asset_status(request, 'active')
-    asserts.asset_params_value(request, 'subscription_id', '==', 'ID:123456789')
+    asserts.asset_param_value(request, 'subscription_id', '==', 'ID:123456789')
 ```
 
 Once the request is dispatched the Dispatcher will reload the request again every `10` seconds a maximum of `20`
@@ -160,7 +160,7 @@ def step_impl(context):
 def step_impl(context):
     asserts.request_status(context.request, 'approved')
     asserts.asset_status(context.request, 'active')
-    asserts.asset_params_value_not_equal(context.request, 'CUSTOMER_EMAIL_ADDRESS', '')
+    asserts.asset_param_value_not_equal(context.request, 'CUSTOMER_EMAIL_ADDRESS', '')
 ```
 
 The `@step("subscription request is processed")` is provided by the DevOps Testing Library.
