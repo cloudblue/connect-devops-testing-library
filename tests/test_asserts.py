@@ -8,8 +8,10 @@ asset_request = {
     'asset': {
         'status': 'active',
         'params': [
-            {'id': 'ID', 'value': 'value', 'value_error': 'some error'},
-            {'id': 'ID_2', 'value': '42', 'value_error': ''},
+            {'id': 'ID', 'type': 'text', 'value': 'value', 'value_error': 'some error'},
+            {'id': 'ID_2', 'type': 'text', 'value': '42', 'value_error': ''},
+            {'id': 'ID_3', 'type': 'checkbox', 'value': '', 'structured_value': {'a': True, 'b': False, 'c': True},
+             'value_error': ''},
         ],
     }
 }
@@ -19,8 +21,10 @@ config_request = {
     'configuration': {
         'status': 'active',
         'params': [
-            {'id': 'ID', 'value': 'value', 'value_error': 'some error'},
-            {'id': 'ID_2', 'value': '42', 'value_error': ''},
+            {'id': 'ID', 'type': 'text', 'value': 'value', 'value_error': 'some error'},
+            {'id': 'ID_2', 'type': 'text', 'value': '42', 'value_error': ''},
+            {'id': 'ID_3', 'type': 'checkbox', 'value': '', 'structured_value': {'a': False, 'b': True, 'c': True},
+             'value_error': ''},
         ],
     }
 }
@@ -52,6 +56,7 @@ def test_should_assert_asset_status():
 
 def test_should_assert_asset_params_value_equal():
     asserts.asset_params_value_equal(asset_request, 'ID', 'value')
+    asserts.asset_params_value_equal(asset_request, 'ID_3', 'a|c')
 
 
 def test_should_assert_asset_params_value_not_equal():
@@ -89,6 +94,7 @@ def test_should_assert_tier_configuration_status():
 
 def test_should_assert_tier_configuration_params_value_equal():
     asserts.tier_configuration_params_value_equal(config_request, 'ID', 'value')
+    asserts.tier_configuration_params_value_equal(config_request, 'ID_3', 'b|c')
 
 
 def test_should_assert_tier_configuration_params_value_not_equal():
