@@ -20,7 +20,7 @@ def _get_request_handler(asset: Callable, tier_config: Callable, request_type: s
     return strategies.get(request_type)
 
 
-def _process_request(context: Context):
+def _request_is_process(context: Context):
     context.request = context.connect.provision_request(
         request=context.builder.build(),
         timeout=context.timeout,
@@ -28,27 +28,51 @@ def _process_request(context: Context):
     )
 
 
-@step("request is processed")
+def _with_checkbox_parameter(context: Context, parameter: str, values: str, checked: bool):
+    handler = _get_request_handler(
+        asset=context.builder.with_asset_param,
+        tier_config=context.builder.with_tier_configuration_param,
+        request_type=context.builder.request_type(),
+    )
+
+    handler(
+        param_id=context.parameter(parameter),
+        value={value: checked for value in values.split("|")},
+        value_type='checkbox',
+    )
+
+
+def _with_parameter_without_value(context: Context, parameter: str):
+    handler = _get_request_handler(
+        asset=context.builder.with_asset_param,
+        tier_config=context.builder.with_tier_configuration_param,
+        request_type=context.builder.request_type(),
+    )
+
+    handler(param_id=context.parameter(parameter))
+
+
+@step('request is processed')
 def request_is_processed(context: Context):
-    _process_request(context)
+    _request_is_process(context)
 
 
-@step("subscription request is processed")
+@step('subscription request is processed')
 def subscription_request_is_processed(context: Context):
-    _process_request(context)
+    _request_is_process(context)
 
 
-@step("tier configuration request is processed")
+@step('tier configuration request is processed')
 def tier_configuration_request_is_processed(context: Context):
-    _process_request(context)
+    _request_is_process(context)
 
 
-@step("tier config request")
+@step('tier config request')
 def tier_config_request(context: Context):
     context.builder = context.builder.from_default_tier_config()
 
 
-@step("asset request")
+@step('asset request')
 def asset_request(context: Context):
     context.builder = context.builder.from_default_asset()
 
@@ -106,6 +130,21 @@ def with_parameter_with_value(context: Context, parameter: str, value: str = '')
     handler(param_id=context.parameter(parameter), value=value.strip())
 
 
+@step('request with parameter "{parameter}" value "{values}" checked')
+def with_parameter_checked(context: Context, parameter: str, values: str):
+    _with_checkbox_parameter(context, parameter, values, True)
+
+
+@step('request with parameter "{parameter}" value "{values}" not checked')
+def with_parameter_not_checked(context: Context, parameter: str, values: str):
+    _with_checkbox_parameter(context, parameter, values, False)
+
+
+@step('request with parameter "{parameter}" without value')
+def with_parameter_without_value(context: Context, parameter: str):
+    _with_parameter_without_value(context, parameter)
+
+
 @step('request with parameter "{parameter}" with value error "{value}"')
 def with_parameter_with_value_error(context: Context, parameter: str, value: str = ''):
     handler = _get_request_handler(
@@ -115,6 +154,11 @@ def with_parameter_with_value_error(context: Context, parameter: str, value: str
     )
 
     handler(param_id=context.parameter(parameter), value_error=value.strip())
+
+
+@step('request with parameter "{parameter}" without value error')
+def with_parameter_without_value_error(context: Context, parameter: str):
+    _with_parameter_without_value(context, parameter)
 
 
 @step('request parameter "{parameter}" value is "{value}"')

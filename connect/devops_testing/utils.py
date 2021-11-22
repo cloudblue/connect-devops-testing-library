@@ -65,11 +65,15 @@ def request_parameters(params: List[dict]) -> List[dict]:
     :param params: dict The list of parameters.
     :return: dict The mapped list of parameters.
     """
-    return list(map(
-        lambda param: {
+
+    def _key(param: dict) -> str:
+        return 'value' if param.get('structured_value') is None else 'structured_value'
+
+    def _map(param: dict) -> dict:
+        return {
             'id': param.get('id'),
-            'value': param.get('value', ''),
+            _key(param): param.get(_key(param), None),
             'value_error': param.get('value_error', ''),
-        },
-        params,
-    ))
+        }
+
+    return list(map(_map, params))

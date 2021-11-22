@@ -110,6 +110,8 @@ configured directly in the `.provision_request(timeout=10, max_attempt=20)` meth
 Obviously, some Connect processors may take a lot of time to process a request, for those type of processors this kind
 of end-to-end test is not suitable.
 
+### Behavior Driven Development
+
 Finally, the DevOps Testing Library also allows you to easily use Behave! BDD tool for you test. You just need to set
 the following code in your `features/environment.py` file
 
@@ -162,6 +164,35 @@ def step_impl(context):
 ```
 
 The `@step("subscription request is processed")` is provided by the DevOps Testing Library.
+
+Available BDD steps:
+
+| Step | Description |
+| ------------- | ------------- |
+| `request is processed`  | Process the request into Connect Platform. |
+| `subscription request is processed`  | Alias of `request is processed`. |
+| `tier configuration request is processed`  | Alias of `request is processed`. |
+| `tier config request`  | Loads a tier configuration request template. |
+| `asset request`  | Loads an asset request template. |
+| `request with id "{request_id}"`  | Sets the request id. |
+| `request with status "{request_status}"`  | Set the request status. |
+| `request with configuration account "{account_id}"`  | Set the request tier configuration account id. |
+| `request with product "{product_id}"`  | Set the request product id. |
+| `request with marketplace "{marketplace_id}"`  | Set the request marketplace id. |
+| `request with reseller level "{level}"`  | Set the request tier configuration reseller level. |
+| `request with parameter "{parameter}" with value "{value}"`  | Set a request parameter value by parameter id. |
+| `request with parameter "{parameter}" value "{values}" checked`  | Check a request checkbox parameter values by id. |
+| `request with parameter "{parameter}" value "{values}" not checked`  | Uncheck a request checkbox parameter values by id. |
+| `request with parameter "{parameter}" without value`  | Unset the request parameter value by id. |
+| `request with parameter "{parameter}" with value error "{value}"`  | Set the request parameter value error by id. |
+| `request with parameter "{parameter}" without value error`  | Unset the request parameter value error. |
+| `request parameter "{parameter}" value is "{value}"`  | Assert that the value of the given parameter by id is the expected one. |
+| `request parameter "{parameter}" value contains "{value}"`  | Assert that the value of the given parameter by id contains the expected value. |
+| `request parameter "{parameter}" value match "{pattern}"`  | Assert that the value of the given parameter by id match the expected regex expression. |
+| `request parameter "{parameter}" value error is "{value_error}"`  | Assert that the value error of the given parameter by id the expected one.  |
+| `request parameter "{parameter}" value error contains "{value_error}"`  | Assert that the value error of the given parameter by id contains the expected value. |
+| `request parameter "{parameter}" value error match "{pattern}"`  | Assert that the value error of the given parameter by id match the expected regex expression. |
+| `request status is "{request_status}"`  | Assert that the status of the request is the expected one. |
 
 ## License
 

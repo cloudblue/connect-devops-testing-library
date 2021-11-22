@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from abc import abstractmethod
 from copy import deepcopy
-from typing import Optional
+from typing import Optional, Union
 
 from connect.client import ConnectClient
 from connect.devops_testing.utils import find_by_id, merge, request_model, request_parameters
@@ -109,6 +109,22 @@ _tier_config_template = {
 }
 
 
+def _param_items(
+        param: dict,
+        value: Optional[Union[str, dict]] = None,
+        value_error: Optional[str] = None,
+) -> dict:
+    if isinstance(value, dict):
+        key = 'structured_value'
+        new_value = param.get(key, {})
+        new_value.update(value)
+    else:
+        key = 'value'
+        new_value = value
+
+    return {key: new_value, 'value_error': value_error}
+
+
 class Builder:
     def __init__(self, request: Optional[dict] = None):
         if request is None:
@@ -177,8 +193,9 @@ class Builder:
     def with_asset_param(
             self,
             param_id: str,
-            value: Optional[str] = None,
+            value: Optional[Union[str, dict]] = None,
             value_error: Optional[str] = None,
+            value_type: str = 'text',
     ) -> Builder:
         param = find_by_id(self._request.get('asset', {}).get('params', []), param_id)
 
@@ -188,14 +205,12 @@ class Builder:
                 'name': param_id,
                 'title': f'Asset parameter {param_id}',
                 'description': f'Asset parameter description of {param_id}',
-                'type': 'text',
-                'value': '',
-                'value_error': '',
+                'type': value_type,
             }
             self._request = merge(self._request, {'asset': {'params': [param]}})
 
-        values = {'value': value, 'value_error': value_error}
-        param.update({k: v for k, v in values.items() if v is not None})
+        items = _param_items(param, value, value_error)
+        param.update({k: v for k, v in items.items() if v is not None})
         return self
 
     def with_asset_item(
@@ -226,7 +241,13 @@ class Builder:
         })
         return self
 
-    def with_asset_item_param(self, item_id: str, param_id: str, value: str = '') -> Builder:
+    def with_asset_item_param(
+            self,
+            item_id: str,
+            param_id: str,
+            value: str = '',
+            value_type: str = 'text',
+    ) -> Builder:
         item = find_by_id(self._request.get('asset', {}).get('items', []), item_id)
         if item is None:
             raise ValueError(f'Undefined item with id {item_id}')
@@ -237,7 +258,7 @@ class Builder:
                 'id': param_id,
                 'title': f'Parameter {param_id}',
                 'description': f'Description of {param_id}',
-                'type': 'text',
+                'type': value_type,
                 'scope': 'item',
                 'phase': 'configuration',
                 'value': '',
@@ -250,22 +271,24 @@ class Builder:
     def with_asset_configuration_param(
             self,
             param_id: str,
-            value: Optional[str] = None,
+            value: Optional[Union[str, dict]] = None,
             value_error: Optional[str] = None,
+            value_type: str = 'text',
     ) -> Builder:
         param = find_by_id(self._request.get('asset', {}).get('configuration', {}).get('params', []), param_id)
+
         if param is None:
             param = {
                 'id': param_id,
                 'name': param_id,
                 'title': f'Asset configuration parameter {param_id}',
-                'description': f'Asset configuration parameter Description of {param_id}',
-                'type': 'text',
+                'description': f'Asset parameter configuration description of {param_id}',
+                'type': value_type,
             }
             self._request = merge(self._request, {'asset': {'configuration': {'params': [param]}}})
 
-        values = {'value': value, 'value_error': value_error}
-        param.update({k: v for k, v in values.items() if v is not None})
+        items = _param_items(param, value, value_error)
+        param.update({k: v for k, v in items.items() if v is not None})
         return self
 
     def with_tier_configuration_id(self, tier_configuration_id: str) -> Builder:
@@ -294,8 +317,9 @@ class Builder:
 
     def with_tier_configuration_param(
             self, param_id: str,
-            value: Optional[str] = None,
+            value: Optional[Union[str, dict]] = None,
             value_error: Optional[str] = None,
+            value_type: str = 'text',
     ) -> Builder:
         locations = [
             (
@@ -316,14 +340,12 @@ class Builder:
                     'name': param_id,
                     'title': f'Asset parameter {param_id}',
                     'description': f'Asset parameter description of {param_id}',
-                    'type': 'text',
-                    'value': '',
-                    'value_error': '',
+                    'type': value_type,
                 }
                 self._request = merge(self._request, location[1](param))
 
-            values = {'value': value, 'value_error': value_error}
-            param.update({k: v for k, v in values.items() if v is not None})
+            items = _param_items(param, value, value_error)
+            param.update({k: v for k, v in items.items() if v is not None})
 
         return self
 

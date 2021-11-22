@@ -6,12 +6,18 @@ from connect.devops_testing.bdd.steps import (
     with_marketplace_id, with_reseller_level, with_parameter_with_value, with_parameter_with_value_error,
     request_status_is, parameter_value_is, parameter_value_error_is, request_is_processed, with_status,
     subscription_request_is_processed, tier_configuration_request_is_processed, parameter_value_contains,
-    parameter_value_error_contains, parameter_value_match, parameter_value_error_match,
+    parameter_value_error_contains, parameter_value_match, parameter_value_error_match, with_parameter_checked,
+    with_parameter_not_checked, with_parameter_without_value, with_parameter_without_value_error,
 )
 
 PARAM_ID_A = 'PARAM_ID_A'
 PARAM_ID_A_VALUE = 'Some value A'
 PARAM_ID_A_VALUE_ERROR = 'Some value error A'
+PARAM_ID_CHECK = 'PARAM_ID_CHECK'
+PARAM_ID_CHECK_VALUE = 'a|b|c'
+PARAM_ID_CHECK_VALUE_NOT = 'a'
+PARAM_ID_NO_VALUE = 'PARAM_ID_NO_VALUE'
+PATTERN = r'^S[\s\w]*A$'
 
 
 def test_step_should_raise_exception_on_undefined_request_type(behave_context):
@@ -34,6 +40,8 @@ def test_step_should_create_a_tier_configuration_request(behave_context):
     with_reseller_level(behave_context, 2)
     with_parameter_with_value(behave_context, PARAM_ID_A, PARAM_ID_A_VALUE)
     with_parameter_with_value_error(behave_context, PARAM_ID_A, PARAM_ID_A_VALUE_ERROR)
+    with_parameter_without_value(behave_context, PARAM_ID_NO_VALUE)
+    with_parameter_without_value_error(behave_context, PARAM_ID_NO_VALUE)
 
     request = behave_context.builder.build()
 
@@ -50,6 +58,9 @@ def test_step_should_create_a_tier_configuration_request(behave_context):
     assert request['params'][0]['id'] == PARAM_ID_A
     assert request['params'][0]['value'] == PARAM_ID_A_VALUE
     assert request['params'][0]['value_error'] == PARAM_ID_A_VALUE_ERROR
+    assert request['params'][1]['id'] == PARAM_ID_NO_VALUE
+    assert 'value' not in request['params'][1]
+    assert 'value_error' not in request['params'][1]
 
 
 def test_step_should_assert_successfully_a_tier_configuration_request(behave_context):
@@ -60,16 +71,19 @@ def test_step_should_assert_successfully_a_tier_configuration_request(behave_con
     with_status(behave_context, 'approved')
     with_parameter_with_value(behave_context, PARAM_ID_A, PARAM_ID_A_VALUE)
     with_parameter_with_value_error(behave_context, PARAM_ID_A, PARAM_ID_A_VALUE_ERROR)
+    with_parameter_checked(behave_context, PARAM_ID_CHECK, PARAM_ID_CHECK_VALUE)
+    with_parameter_not_checked(behave_context, PARAM_ID_CHECK, PARAM_ID_CHECK_VALUE_NOT)
 
     behave_context.request = behave_context.builder.build()
 
     request_status_is(behave_context, 'approved')
     parameter_value_is(behave_context, PARAM_ID_A, PARAM_ID_A_VALUE)
     parameter_value_contains(behave_context, PARAM_ID_A, 'value')
-    parameter_value_match(behave_context, PARAM_ID_A, r'^S[\s\w]*A$')
+    parameter_value_match(behave_context, PARAM_ID_A, PATTERN)
     parameter_value_error_is(behave_context, PARAM_ID_A, PARAM_ID_A_VALUE_ERROR)
     parameter_value_error_contains(behave_context, PARAM_ID_A, 'error')
-    parameter_value_error_match(behave_context, PARAM_ID_A, r'^S[\s\w]*A$')
+    parameter_value_error_match(behave_context, PARAM_ID_A, PATTERN)
+    parameter_value_is(behave_context, PARAM_ID_CHECK, 'b|c')
 
 
 def test_step_should_create_an_asset_request(behave_context):
@@ -82,6 +96,8 @@ def test_step_should_create_an_asset_request(behave_context):
     with_marketplace_id(behave_context, 'MP-00000')
     with_parameter_with_value(behave_context, PARAM_ID_A, PARAM_ID_A_VALUE)
     with_parameter_with_value_error(behave_context, PARAM_ID_A, PARAM_ID_A_VALUE_ERROR)
+    with_parameter_without_value(behave_context, PARAM_ID_NO_VALUE)
+    with_parameter_without_value_error(behave_context, PARAM_ID_NO_VALUE)
 
     request = behave_context.builder.build()
 
@@ -93,6 +109,9 @@ def test_step_should_create_an_asset_request(behave_context):
     assert request['asset']['params'][0]['id'] == PARAM_ID_A
     assert request['asset']['params'][0]['value'] == PARAM_ID_A_VALUE
     assert request['asset']['params'][0]['value_error'] == PARAM_ID_A_VALUE_ERROR
+    assert request['asset']['params'][1]['id'] == PARAM_ID_NO_VALUE
+    assert 'value' not in request['asset']['params'][1]
+    assert 'value_error' not in request['asset']['params'][1]
 
 
 def test_step_should_assert_successfully_an_asset_request(behave_context):
@@ -103,16 +122,19 @@ def test_step_should_assert_successfully_an_asset_request(behave_context):
     with_status(behave_context, 'pending')
     with_parameter_with_value(behave_context, PARAM_ID_A, PARAM_ID_A_VALUE)
     with_parameter_with_value_error(behave_context, PARAM_ID_A, PARAM_ID_A_VALUE_ERROR)
+    with_parameter_checked(behave_context, PARAM_ID_CHECK, PARAM_ID_CHECK_VALUE)
+    with_parameter_not_checked(behave_context, PARAM_ID_CHECK, PARAM_ID_CHECK_VALUE_NOT)
 
     behave_context.request = behave_context.builder.build()
 
     request_status_is(behave_context, 'pending')
     parameter_value_is(behave_context, PARAM_ID_A, PARAM_ID_A_VALUE)
     parameter_value_contains(behave_context, PARAM_ID_A, 'value')
-    parameter_value_match(behave_context, PARAM_ID_A, r'^S[\s\w]*A$')
+    parameter_value_match(behave_context, PARAM_ID_A, PATTERN)
     parameter_value_error_is(behave_context, PARAM_ID_A, PARAM_ID_A_VALUE_ERROR)
     parameter_value_error_contains(behave_context, PARAM_ID_A, 'error')
-    parameter_value_error_match(behave_context, PARAM_ID_A, r'^S[\s\w]*A$')
+    parameter_value_error_match(behave_context, PARAM_ID_A, PATTERN)
+    parameter_value_is(behave_context, PARAM_ID_CHECK, 'b|c')
 
 
 def test_step_should_successfully_process_the_request(sync_client_factory, response_factory, behave_context):
