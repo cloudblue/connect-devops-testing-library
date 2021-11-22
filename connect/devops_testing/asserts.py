@@ -39,56 +39,56 @@ def asset_status(request: dict, expected: str):
     assert request.get('asset', {}).get('status') == expected
 
 
-def asset_params_value(request: dict, param_id: str, operator: str, expected: Any):
+def asset_param_value(request: dict, param_id: str, operator: str, expected: Any):
     fn = __operators.get(operator)
     param = find_by_id(request.get('asset', {}).get('params', []), param_id, {})
 
     assert fn(*_prepare_assert_argument(param, expected))
 
 
-def asset_params_value_equal(request: dict, param_id: str, expected: Any):
-    asset_params_value(request, param_id, '==', expected)
+def asset_param_value_equal(request: dict, param_id: str, expected: Any):
+    asset_param_value(request, param_id, '==', expected)
 
 
-def asset_params_value_match(request: dict, param_id: str, pattern: str):
-    asset_params_value(request, param_id, 'match', pattern)
+def asset_param_value_match(request: dict, param_id: str, pattern: str):
+    asset_param_value(request, param_id, 'match', pattern)
 
 
-def asset_params_value_not_equal(request: dict, param_id: str, expected: Any):
-    asset_params_value(request, param_id, '!=', expected)
+def asset_param_value_not_equal(request: dict, param_id: str, expected: Any):
+    asset_param_value(request, param_id, '!=', expected)
 
 
-def asset_params_value_contains(request: dict, param_id: str, expected: Any):
-    asset_params_value(request, param_id, 'in', expected)
+def asset_param_value_contains(request: dict, param_id: str, expected: Any):
+    asset_param_value(request, param_id, 'in', expected)
 
 
-def asset_params_value_error(request: dict, param_id: str, operator: str, expected: Any):
+def asset_param_value_error(request: dict, param_id: str, operator: str, expected: Any):
     fn = __operators.get(operator)
     param = find_by_id(request.get('asset', {}).get('params', []), param_id, {})
     assert fn(param.get('value_error'), expected)
 
 
-def asset_params_value_equal_error(request: dict, param_id: str, expected: Any):
-    asset_params_value_error(request, param_id, '==', expected)
+def asset_param_value_error_equal(request: dict, param_id: str, expected: Any):
+    asset_param_value_error(request, param_id, '==', expected)
 
 
-def asset_params_value_not_equal_error(request: dict, param_id: str, expected: Any):
-    asset_params_value_error(request, param_id, '!=', expected)
+def asset_param_value_error_not_equal(request: dict, param_id: str, expected: Any):
+    asset_param_value_error(request, param_id, '!=', expected)
 
 
-def asset_params_value_contains_error(request: dict, param_id: str, expected: Any):
-    asset_params_value_error(request, param_id, 'in', expected)
+def asset_param_value_error_contains(request: dict, param_id: str, expected: Any):
+    asset_param_value_error(request, param_id, 'in', expected)
 
 
-def asset_params_value_error_match(request: dict, param_id: str, pattern: str):
-    asset_params_value_error(request, param_id, 'match', pattern)
+def asset_param_value_error_match(request: dict, param_id: str, pattern: str):
+    asset_param_value_error(request, param_id, 'match', pattern)
 
 
 def tier_configuration_status(request: dict, expected: str):
     assert request.get('configuration', {}).get('status') == expected
 
 
-def tier_configuration_params_value(request: dict, param_id: str, operator: str, expected: Any):
+def tier_configuration_param_value(request: dict, param_id: str, operator: str, expected: Any):
     fn = __operators.get(operator)
     param = find_by_id(
         request.get('params', request.get('configuration', {}).get('params', [])),
@@ -98,23 +98,23 @@ def tier_configuration_params_value(request: dict, param_id: str, operator: str,
     assert fn(*_prepare_assert_argument(param, expected))
 
 
-def tier_configuration_params_value_equal(request: dict, param_id: str, expected: Any):
-    tier_configuration_params_value(request, param_id, '==', expected)
+def tier_configuration_param_value_equal(request: dict, param_id: str, expected: Any):
+    tier_configuration_param_value(request, param_id, '==', expected)
 
 
-def tier_configuration_params_value_not_equal(request: dict, param_id: str, expected: Any):
-    tier_configuration_params_value(request, param_id, '!=', expected)
+def tier_configuration_param_value_not_equal(request: dict, param_id: str, expected: Any):
+    tier_configuration_param_value(request, param_id, '!=', expected)
 
 
-def tier_configuration_params_value_contains(request: dict, param_id: str, expected: Any):
-    tier_configuration_params_value(request, param_id, 'in', expected)
+def tier_configuration_param_value_contains(request: dict, param_id: str, expected: Any):
+    tier_configuration_param_value(request, param_id, 'in', expected)
 
 
-def tier_configuration_params_value_match(request: dict, param_id: str, pattern: str):
-    tier_configuration_params_value(request, param_id, 'match', pattern)
+def tier_configuration_param_value_match(request: dict, param_id: str, pattern: str):
+    tier_configuration_param_value(request, param_id, 'match', pattern)
 
 
-def tier_configuration_params_value_error(request: dict, param_id: str, operator: str, expected: Any):
+def tier_configuration_param_value_error(request: dict, param_id: str, operator: str, expected: Any):
     fn = __operators.get(operator)
     param = find_by_id(
         request.get('params', request.get('configuration', {}).get('params', [])),
@@ -124,17 +124,17 @@ def tier_configuration_params_value_error(request: dict, param_id: str, operator
     assert fn(param.get('value_error'), expected)
 
 
-def tier_configuration_params_value_equal_error(request: dict, param_id: str, expected: Any):
-    tier_configuration_params_value_error(request, param_id, '==', expected)
+def tier_configuration_param_value_error_equal(request: dict, param_id: str, expected: Any):
+    tier_configuration_param_value_error(request, param_id, '==', expected)
 
 
-def tier_configuration_params_value_not_equal_error(request: dict, param_id: str, expected: Any):
-    tier_configuration_params_value_error(request, param_id, '!=', expected)
+def tier_configuration_param_value_error_not_equal(request: dict, param_id: str, expected: Any):
+    tier_configuration_param_value_error(request, param_id, '!=', expected)
 
 
-def tier_configuration_params_value_contains_error(request: dict, param_id: str, expected: Any):
-    tier_configuration_params_value_error(request, param_id, 'in', expected)
+def tier_configuration_param_value_error_contains(request: dict, param_id: str, expected: Any):
+    tier_configuration_param_value_error(request, param_id, 'in', expected)
 
 
-def tier_configuration_params_value_error_match(request: dict, param_id: str, pattern: str):
-    tier_configuration_params_value_error(request, param_id, 'match', pattern)
+def tier_configuration_param_value_error_match(request: dict, param_id: str, pattern: str):
+    tier_configuration_param_value_error(request, param_id, 'match', pattern)

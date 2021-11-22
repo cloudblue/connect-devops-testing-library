@@ -164,8 +164,8 @@ def with_parameter_without_value_error(context: Context, parameter: str):
 @step('request parameter "{parameter}" value is "{value}"')
 def parameter_value_is(context: Context, parameter: str, value: str):
     handler = _get_request_handler(
-        asset=asserts.asset_params_value_equal,
-        tier_config=asserts.tier_configuration_params_value_equal,
+        asset=asserts.asset_param_value_equal,
+        tier_config=asserts.tier_configuration_param_value_equal,
         request_type=request_model(context.request),
     )
 
@@ -179,8 +179,8 @@ def parameter_value_is(context: Context, parameter: str, value: str):
 @step('request parameter "{parameter}" value contains "{value}"')
 def parameter_value_contains(context: Context, parameter: str, value: str):
     handler = _get_request_handler(
-        asset=asserts.asset_params_value_contains,
-        tier_config=asserts.tier_configuration_params_value_contains,
+        asset=asserts.asset_param_value_contains,
+        tier_config=asserts.tier_configuration_param_value_contains,
         request_type=request_model(context.request),
     )
 
@@ -194,8 +194,8 @@ def parameter_value_contains(context: Context, parameter: str, value: str):
 @step('request parameter "{parameter}" value match "{pattern}"')
 def parameter_value_match(context: Context, parameter: str, pattern: str):
     handler = _get_request_handler(
-        asset=asserts.asset_params_value_match,
-        tier_config=asserts.tier_configuration_params_value_match,
+        asset=asserts.asset_param_value_match,
+        tier_config=asserts.tier_configuration_param_value_match,
         request_type=request_model(context.request),
     )
 
@@ -209,8 +209,8 @@ def parameter_value_match(context: Context, parameter: str, pattern: str):
 @step('request parameter "{parameter}" value error is "{value_error}"')
 def parameter_value_error_is(context: Context, parameter: str, value_error: str):
     handler = _get_request_handler(
-        asset=asserts.asset_params_value_equal_error,
-        tier_config=asserts.tier_configuration_params_value_equal_error,
+        asset=asserts.asset_param_value_error_equal,
+        tier_config=asserts.tier_configuration_param_value_error_equal,
         request_type=request_model(context.request),
     )
 
@@ -224,8 +224,8 @@ def parameter_value_error_is(context: Context, parameter: str, value_error: str)
 @step('request parameter "{parameter}" value error contains "{value_error}"')
 def parameter_value_error_contains(context: Context, parameter: str, value_error: str):
     handler = _get_request_handler(
-        asset=asserts.asset_params_value_contains_error,
-        tier_config=asserts.tier_configuration_params_value_contains_error,
+        asset=asserts.asset_param_value_error_contains,
+        tier_config=asserts.tier_configuration_param_value_error_contains,
         request_type=request_model(context.request),
     )
 
@@ -239,8 +239,8 @@ def parameter_value_error_contains(context: Context, parameter: str, value_error
 @step('request parameter "{parameter}" value error match "{pattern}"')
 def parameter_value_error_match(context: Context, parameter: str, pattern: str):
     handler = _get_request_handler(
-        asset=asserts.asset_params_value_error_match,
-        tier_config=asserts.tier_configuration_params_value_error_match,
+        asset=asserts.asset_param_value_error_match,
+        tier_config=asserts.tier_configuration_param_value_error_match,
         request_type=request_model(context.request),
     )
 
