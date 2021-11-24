@@ -21,11 +21,14 @@ def _get_request_handler(asset: Callable, tier_config: Callable, request_type: s
 
 
 def _request_is_process(context: Context):
-    context.request = context.connect.provision_request(
+    if isinstance(context.request, dict) and context.request.get('id') is not None:
+        context.builder.with_id(context.request.get('id'))
+
+    context.request.update(context.connect.provision_request(
         request=context.builder.build(),
         timeout=context.timeout,
         max_attempt=context.max_attempts,
-    )
+    ))
 
 
 def _with_checkbox_parameter(context: Context, parameter: str, values: str, checked: bool):
@@ -70,11 +73,14 @@ def tier_configuration_request_is_processed(context: Context):
 @step('tier config request')
 def tier_config_request(context: Context):
     context.builder = context.builder.from_default_tier_config()
+    context.builder = context.builder.with_tier_configuration_account('random')
 
 
 @step('asset request')
 def asset_request(context: Context):
     context.builder = context.builder.from_default_asset()
+    context.builder = context.builder.with_asset_tier_customer('random')
+    context.builder = context.builder.with_asset_tier_tier1('random')
 
 
 @step('request with id "{request_id}"')
@@ -90,6 +96,21 @@ def with_status(context: Context, request_status: str):
 @step('request with configuration account "{account_id}"')
 def with_tier_config_account(context: Context, account_id: str):
     context.builder.with_tier_configuration_account(account_id)
+
+
+@step('request with asset customer "{customer_id}"')
+def with_asset_tier_customer(context: Context, customer_id: str):
+    context.builder.with_asset_tier_customer(customer_id)
+
+
+@step('request with asset tier1 "{tier1_id}"')
+def with_asset_tier_tier1(context: Context, tier1_id: str):
+    context.builder.with_asset_tier_tier1(tier1_id)
+
+
+@step('request with asset tier2 "{tier2_id}"')
+def with_asset_tier_tier2(context: Context, tier2_id: str):
+    context.builder.with_asset_tier_tier2(tier2_id)
 
 
 @step('request with product "{product_id}"')

@@ -149,6 +149,25 @@ def test_request_builder_should_build_successfully_a_valid_tier_config_request()
     assert request['params'][2]['value_error'] == 'Some value error on configuration'
 
 
+def test_request_builder_should_build_successfully_a_valid_tier_config_request_with_random_account_data():
+    request = (Builder()
+               .with_type('setup')
+               .with_status('approved')
+               .with_id('TCR-000-000-000-100')
+               .with_tier_configuration_id('TC-000-000-000')
+               .with_tier_configuration_account('random'))
+
+    assert request.is_tier_config_request()
+
+    request = request.build()
+
+    assert request['id'] == 'TCR-000-000-000-100'
+    assert request['type'] == 'setup'
+    assert request['status'] == 'approved'
+
+    assert 'contact_info' in request['configuration']['account']
+
+
 def test_request_builder_should_build_successfully_a_valid_request_from_file_template():
     template = os.path.dirname(__file__) + TPL_REQUEST_ASSET
 
