@@ -1,11 +1,13 @@
 from typing import Optional
 
+from behave import fixture
 from behave.runner import Context
 
 from connect.client import ConnectClient
 from connect.devops_testing.fixtures import make_request_builder, make_request_dispatcher
 
 
+@fixture
 def use_connect_request_dispatcher(
         context: Context,
         api_key: Optional[str] = None,
@@ -37,9 +39,24 @@ def use_connect_request_dispatcher(
     )
     context.timeout = timeout
     context.max_attempts = max_attempts
-    context.request = {}
+
+    use_connect_request_store(context)
 
 
+@fixture
+def use_connect_request_store(context: Context, reset: bool = False):
+    """
+    Provides a simple way initialize (or reset) the request store.
+
+    :param context: Context
+    :param reset: bool True to reset the request store.
+    :return: None
+    """
+    if not hasattr(context, 'request') or reset:
+        context.request = {}
+
+
+@fixture
 def use_connect_request_builder(context: Context, parameters: Optional[dict] = None):
     """
     Provides a connect request builder into the behave Context object.

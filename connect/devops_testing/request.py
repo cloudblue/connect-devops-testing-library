@@ -7,6 +7,8 @@ from typing import Optional, Union
 from connect.client import ConnectClient
 from connect.devops_testing.utils import find_by_id, merge, request_model, request_parameters
 
+from faker import Faker
+
 import json
 import time
 
@@ -26,58 +28,7 @@ _asset_template = {
             "type": "preview",
         },
         "params": [],
-        "tiers": {
-            "customer": {
-                "id": "TA-0000-0000-0000",
-                "external_id": "00000",
-                "name": "Customer Name",
-                "external_uid": "00000000-0000-0000-0000-000000000000",
-                "contact_info": {
-                    "address_line1": "Address Line 1",
-                    "address_line2": "Address Line 2",
-                    "country": "US",
-                    "state": "California",
-                    "city": "Irvine",
-                    "postal_code": "00000",
-                    "contact": {
-                        "first_name": "First",
-                        "last_name": "Last",
-                        "email": "customer@email.com",
-                        "phone_number": {
-                            "country_code": "+1",
-                            "area_code": "555",
-                            "phone_number": "8677089",
-                            "extension": "",
-                        },
-                    },
-                },
-            },
-            "tier1": {
-                "id": "TA-0-0000-0000-0000",
-                "external_id": "00000",
-                "name": "Tier 1 Name",
-                "external_uid": "00000000-0000-0000-0000-000000000000",
-                "contact_info": {
-                    "address_line1": "Address Line 1",
-                    "address_line2": "Address Line 2",
-                    "country": "US",
-                    "state": "California",
-                    "city": "Irvine",
-                    "postal_code": "00000",
-                    "contact": {
-                        "first_name": "First",
-                        "last_name": "Last",
-                        "email": "tier1@email.com",
-                        "phone_number": {
-                            "country_code": "+1",
-                            "area_code": "555",
-                            "phone_number": "8677089",
-                            "extension": "",
-                        },
-                    },
-                },
-            },
-        },
+        "tiers": {},
         "items": [],
         "configuration": {
             "params": [],
@@ -93,9 +44,7 @@ _tier_config_template = {
     "status": "pending",
     "configuration": {
         "status": "active",
-        "account": {
-            "id": "TA-0000-0000-0000",
-        },
+        "account": {},
         "product": {
             "id": "PRD-000-000-000",
             "status": "published",
@@ -135,6 +84,33 @@ class Builder:
 
         self._original = deepcopy(request)
         self._request = deepcopy(request)
+        self._fake = Faker(['en_US'])
+
+    def _make_tier(self, tier_type: str = 'customer') -> dict:
+        return {
+            "name": self._fake.company(),
+            "type": tier_type,
+            "external_uid": f"{self._fake.uuid4()}",
+            "contact_info": {
+                "address_line1": f"{self._fake.pyint(100, 999)}, {self._fake.street_name()}",
+                "address_line2": self._fake.secondary_address(),
+                "city": self._fake.city(),
+                "state": self._fake.state(),
+                "postal_code": self._fake.zipcode(),
+                "country": self._fake.country(),
+                "contact": {
+                    "first_name": self._fake.first_name(),
+                    "last_name": self._fake.last_name(),
+                    "email": self._fake.company_email(),
+                    "phone_number": {
+                        "country_code": f"+{self._fake.pyint(1, 99)}",
+                        "area_code": f"{self._fake.pyint(1, 99)}",
+                        "phone_number": f"{self._fake.pyint(1, 999999)}",
+                        "extension": f"{self._fake.pyint(1, 100)}",
+                    },
+                },
+            },
+        }
 
     @classmethod
     def from_file(cls, path: str) -> Builder:
@@ -188,6 +164,24 @@ class Builder:
 
     def with_asset_marketplace(self, marketplace_id: str) -> Builder:
         self._request = merge(self._request, {'asset': {'marketplace': {'id': marketplace_id}}})
+        return self
+
+    def with_asset_tier_customer(self, customer_id: str) -> Builder:
+        customer = self._make_tier('customer') if customer_id == 'random' else {'id': customer_id}
+
+        self._request = merge(self._request, {'asset': {'tiers': {'customer': customer}}})
+        return self
+
+    def with_asset_tier_tier1(self, tier1_id: str) -> Builder:
+        tier1 = self._make_tier('reseller') if tier1_id == 'random' else {'id': tier1_id}
+
+        self._request = merge(self._request, {'asset': {'tiers': {'tier1': tier1}}})
+        return self
+
+    def with_asset_tier_tier2(self, tier2_id: str) -> Builder:
+        tier2 = self._make_tier('reseller') if tier2_id == 'random' else {'id': tier2_id}
+
+        self._request = merge(self._request, {'asset': {'tiers': {'tier2': tier2}}})
         return self
 
     def with_asset_param(
@@ -307,8 +301,10 @@ class Builder:
         self._request = merge(self._request, {'configuration': {'marketplace': {'id': marketplace_id}}})
         return self
 
-    def with_tier_configuration_account(self, account_id: str) -> Builder:
-        self._request = merge(self._request, {'configuration': {'account': {'id': account_id}}})
+    def with_tier_configuration_account(self, account_id: str = 'random') -> Builder:
+        account = self._make_tier('reseller') if account_id == 'random' else {'id': account_id}
+
+        self._request = merge(self._request, {'configuration': {'account': account}})
         return self
 
     def with_tier_configuration_tier_level(self, level: int) -> Builder:

@@ -8,6 +8,7 @@ from connect.devops_testing.bdd.steps import (
     subscription_request_is_processed, tier_configuration_request_is_processed, parameter_value_contains,
     parameter_value_error_contains, parameter_value_match, parameter_value_error_match, with_parameter_checked,
     with_parameter_not_checked, with_parameter_without_value, with_parameter_without_value_error,
+    with_asset_tier_customer, with_asset_tier_tier1, with_asset_tier_tier2,
 )
 
 PARAM_ID_A = 'PARAM_ID_A'
@@ -94,6 +95,9 @@ def test_step_should_create_an_asset_request(behave_context):
     with_status(behave_context, 'pending')
     with_product_id(behave_context, 'PRD-000-000-000')
     with_marketplace_id(behave_context, 'MP-00000')
+    with_asset_tier_customer(behave_context, 'TA-0000-0000-0000')
+    with_asset_tier_tier1(behave_context, 'TA-0000-0000-0001')
+    with_asset_tier_tier2(behave_context, 'TA-0000-0000-0002')
     with_parameter_with_value(behave_context, PARAM_ID_A, PARAM_ID_A_VALUE)
     with_parameter_with_value_error(behave_context, PARAM_ID_A, PARAM_ID_A_VALUE_ERROR)
     with_parameter_without_value(behave_context, PARAM_ID_NO_VALUE)
@@ -106,6 +110,9 @@ def test_step_should_create_an_asset_request(behave_context):
     assert request['type'] == 'purchase'
     assert request['asset']['product']['id'] == 'PRD-000-000-000'
     assert request['asset']['marketplace']['id'] == 'MP-00000'
+    assert request['asset']['tiers']['customer']['id'] == 'TA-0000-0000-0000'
+    assert request['asset']['tiers']['tier1']['id'] == 'TA-0000-0000-0001'
+    assert request['asset']['tiers']['tier2']['id'] == 'TA-0000-0000-0002'
     assert request['asset']['params'][0]['id'] == PARAM_ID_A
     assert request['asset']['params'][0]['value'] == PARAM_ID_A_VALUE
     assert request['asset']['params'][0]['value_error'] == PARAM_ID_A_VALUE_ERROR
@@ -144,11 +151,12 @@ def test_step_should_successfully_process_the_request(sync_client_factory, respo
         tier_configuration_request_is_processed
     ]
 
+    behave_context.request = {'id': 'PR-000-000-000-000'}
+
     for process_step in process_steps:
         use_connect_request_builder(context=behave_context)
 
         asset_request(behave_context)
-        with_id(behave_context, 'PR-000-000-000-000')
         with_status(behave_context, 'pending')
 
         mocked_client = sync_client_factory([

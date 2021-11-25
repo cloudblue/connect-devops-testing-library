@@ -116,16 +116,38 @@ Finally, the DevOps Testing Library also allows you to easily use Behave! BDD to
 the following code in your `features/environment.py` file
 
 ```python
-from connect.devops_testing.bdd.fixtures import use_connect_request_dispatcher, use_connect_request_builder
+from behave import use_fixture
+
 # import the built-in steps for e2e testing. 
 from connect.devops_testing.bdd import steps
+from connect.devops_testing.bdd.fixtures import (
+    use_connect_request_dispatcher,
+    use_connect_request_builder,
+    use_connect_request_store,
+)
 
 
 def before_all(context):
-    # attach the request dispatcher to the behave context if you want do e2e test.
-    use_connect_request_dispatcher(context)
+    # attach the request dispatcher to the behave context.
+    use_fixture(
+        fixture_func=use_connect_request_dispatcher,
+        context=context,
+    )
     # attach the request builder to the behave context.
-    use_connect_request_builder(context)
+    use_fixture(
+        fixture_func=use_connect_request_builder,
+        context=context,
+    )
+
+
+def before_feature(context, feature):
+    # reset the request store for each feature
+    use_fixture(
+        fixture_func=use_connect_request_store,
+        context=context,
+        reset=True
+    )
+
 ```
 
 It's time to define the feature file in `features/purchase.feature`:
