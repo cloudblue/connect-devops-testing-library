@@ -44,6 +44,7 @@ def test_request_builder_should_build_successfully_a_valid_asset_request():
                .with_asset_id('AS-0000-0000-1000')
                .with_asset_status('active')
                .with_asset_marketplace('MP-12345')
+               .with_asset_connection('CT-0000-0000-0000', 'test')
                .with_asset_param('PARAM_ID_001', 'VALUE_001')
                .with_asset_param('PARAM_ID_002', 'VALUE_002')
                .with_asset_param('PARAM_ID_003', '', 'Some value error on asset')
@@ -67,6 +68,9 @@ def test_request_builder_should_build_successfully_a_valid_asset_request():
     assert request['asset']['status'] == 'active'
 
     assert request['asset']['marketplace']['id'] == 'MP-12345'
+
+    assert request['asset']['connection']['id'] == 'CT-0000-0000-0000'
+    assert request['asset']['connection']['type'] == 'test'
 
     assert request['asset']['product']['id'] == 'PRD-000-000-100'
     assert request['asset']['product']['status'] == 'disabled'
@@ -100,6 +104,9 @@ def test_request_builder_should_build_successfully_a_valid_tier_config_request()
                .with_tier_configuration_id('TC-000-000-000')
                .with_tier_configuration_status('active')
                .with_tier_configuration_marketplace('MP-12345')
+               .with_tier_configuration_connection('CT-0000-0000-0000', 'test')
+               .with_tier_configuration_configuration_param('P_CFG_CFG_ID', 'CFG_VALUE')
+               .with_tier_configuration_configuration_param('P_CFG_CFG_ID', 'CFG_VALUE_UPDATED')
                .with_tier_configuration_product('PRD-000-000-100', 'disabled')
                .with_tier_configuration_account('TA-0000-0000-1000')
                .with_tier_configuration_tier_level(2)
@@ -120,6 +127,12 @@ def test_request_builder_should_build_successfully_a_valid_tier_config_request()
     assert request['configuration']['status'] == 'active'
 
     assert request['configuration']['marketplace']['id'] == 'MP-12345'
+
+    assert request['configuration']['connection']['id'] == 'CT-0000-0000-0000'
+    assert request['configuration']['connection']['type'] == 'test'
+
+    assert request['configuration']['configuration']['params'][0]['id'] == 'P_CFG_CFG_ID'
+    assert request['configuration']['configuration']['params'][0]['value'] == 'CFG_VALUE_UPDATED'
 
     assert request['configuration']['product']['id'] == 'PRD-000-000-100'
     assert request['configuration']['product']['status'] == 'disabled'

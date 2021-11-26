@@ -58,7 +58,7 @@ _tier_config_template = {
 }
 
 
-def _param_items(
+def _param_members(
         param: dict,
         value: Optional[Union[str, dict]] = None,
         value_error: Optional[str] = None,
@@ -166,6 +166,13 @@ class Builder:
         self._request = merge(self._request, {'asset': {'marketplace': {'id': marketplace_id}}})
         return self
 
+    def with_asset_connection(self, connection_id: str, connection_type: str):
+        self._request = merge(self._request, {'asset': {'connection': {
+            'id': connection_id,
+            'type': connection_type,
+        }}})
+        return self
+
     def with_asset_tier_customer(self, customer_id: str) -> Builder:
         customer = self._make_tier('customer') if customer_id == 'random' else {'id': customer_id}
 
@@ -203,8 +210,8 @@ class Builder:
             }
             self._request = merge(self._request, {'asset': {'params': [param]}})
 
-        items = _param_items(param, value, value_error)
-        param.update({k: v for k, v in items.items() if v is not None})
+        members = _param_members(param, value, value_error)
+        param.update({k: v for k, v in members.items() if v is not None})
         return self
 
     def with_asset_item(
@@ -281,8 +288,8 @@ class Builder:
             }
             self._request = merge(self._request, {'asset': {'configuration': {'params': [param]}}})
 
-        items = _param_items(param, value, value_error)
-        param.update({k: v for k, v in items.items() if v is not None})
+        members = _param_members(param, value, value_error)
+        param.update({k: v for k, v in members.items() if v is not None})
         return self
 
     def with_tier_configuration_id(self, tier_configuration_id: str) -> Builder:
@@ -301,6 +308,13 @@ class Builder:
         self._request = merge(self._request, {'configuration': {'marketplace': {'id': marketplace_id}}})
         return self
 
+    def with_tier_configuration_connection(self, connection_id: str, connection_type: str):
+        self._request = merge(self._request, {'configuration': {'connection': {
+            'id': connection_id,
+            'type': connection_type,
+        }}})
+        return self
+
     def with_tier_configuration_account(self, account_id: str = 'random') -> Builder:
         account = self._make_tier('reseller') if account_id == 'random' else {'id': account_id}
 
@@ -312,7 +326,8 @@ class Builder:
         return self
 
     def with_tier_configuration_param(
-            self, param_id: str,
+            self,
+            param_id: str,
             value: Optional[Union[str, dict]] = None,
             value_error: Optional[str] = None,
             value_type: str = 'text',
@@ -334,14 +349,39 @@ class Builder:
                 param = {
                     'id': param_id,
                     'name': param_id,
-                    'title': f'Asset parameter {param_id}',
-                    'description': f'Asset parameter description of {param_id}',
+                    'title': f'Configuration parameter {param_id}',
+                    'description': f'Configuration parameter description of {param_id}',
                     'type': value_type,
                 }
                 self._request = merge(self._request, location[1](param))
 
-            items = _param_items(param, value, value_error)
-            param.update({k: v for k, v in items.items() if v is not None})
+            members = _param_members(param, value, value_error)
+            param.update({k: v for k, v in members.items() if v is not None})
+
+        return self
+
+    def with_tier_configuration_configuration_param(
+            self,
+            param_id: str,
+            value: Optional[Union[str, dict]] = None,
+            value_error: Optional[str] = None,
+            value_type: str = 'text',
+    ) -> Builder:
+        param = find_by_id(
+            self._request.get('configuration', {}).get('configuration', {}).get('params', []),
+            param_id,
+        )
+        if param is None:
+            param = {
+                'id': param_id,
+                'title': f'Configuration parameter {param_id}',
+                'description': f'Configuration parameter description of {param_id}',
+                'type': value_type,
+            }
+            self._request = merge(self._request, {'configuration': {'configuration': {'params': [param]}}})
+
+        members = _param_members(param, value, value_error)
+        param.update({k: v for k, v in members.items() if v is not None})
 
         return self
 
@@ -353,11 +393,13 @@ class Builder:
 
 
 class Dispatcher:
-    def __init__(self, client: ConnectClient):
+    def __init__(self, client: ConnectClient, timeout: int = 10, max_attempts: int = 20):
         self._handlers = [
             _AssetRequestRepository(client, 'asset'),
             _TierConfigRequestRepository(client, 'tier-config'),
         ]
+        self._timeout = timeout
+        self._max_attempts = max_attempts
 
     def _get_request_handler(self, request: dict) -> Optional[_RequestRepository]:
         filtered = list(filter(lambda handler: handler.is_type_valid(request), self._handlers))
@@ -379,7 +421,12 @@ class Dispatcher:
 
         return request
 
-    def provision_request(self, request: dict, timeout: int = 10, max_attempt: int = 20) -> dict:
+    def provision_request(
+            self,
+            request: dict,
+            timeout: Optional[int] = None,
+            max_attempt: Optional[int] = None,
+    ) -> dict:
         """
         Provision the given request into the Connect platform and waits util
         the request is processed by some processor (can be manually processed)
@@ -391,8 +438,8 @@ class Dispatcher:
         """
         return self._fetch_processed_request(
             request=self._save_request(request),
-            timeout=timeout,
-            max_attempt=max_attempt,
+            timeout=self._timeout if timeout is None else timeout,
+            max_attempt=self._max_attempts if max_attempt is None else max_attempt,
         )
 
 

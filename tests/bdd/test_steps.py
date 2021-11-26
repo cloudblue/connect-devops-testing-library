@@ -8,7 +8,7 @@ from connect.devops_testing.bdd.steps import (
     subscription_request_is_processed, tier_configuration_request_is_processed, parameter_value_contains,
     parameter_value_error_contains, parameter_value_match, parameter_value_error_match, with_parameter_checked,
     with_parameter_not_checked, with_parameter_without_value, with_parameter_without_value_error,
-    with_asset_tier_customer, with_asset_tier_tier1, with_asset_tier_tier2,
+    with_asset_tier_customer, with_asset_tier_tier1, with_asset_tier_tier2, with_connection_id,
 )
 
 PARAM_ID_A = 'PARAM_ID_A'
@@ -37,6 +37,7 @@ def test_step_should_create_a_tier_configuration_request(behave_context):
     with_status(behave_context, 'pending')
     with_product_id(behave_context, 'PRD-000-000-000')
     with_marketplace_id(behave_context, 'MP-00000')
+    with_connection_id(behave_context, 'CT-0000-0000-0000', 'test')
     with_tier_config_account(behave_context, 'TA-0000-0000-0000')
     with_reseller_level(behave_context, 2)
     with_parameter_with_value(behave_context, PARAM_ID_A, PARAM_ID_A_VALUE)
@@ -52,6 +53,8 @@ def test_step_should_create_a_tier_configuration_request(behave_context):
     assert request['configuration']['product']['id'] == 'PRD-000-000-000'
     assert request['configuration']['account']['id'] == 'TA-0000-0000-0000'
     assert request['configuration']['marketplace']['id'] == 'MP-00000'
+    assert request['configuration']['connection']['id'] == 'CT-0000-0000-0000'
+    assert request['configuration']['connection']['type'] == 'test'
     assert request['configuration']['tier_level'] == 2
     assert request['configuration']['params'][0]['id'] == PARAM_ID_A
     assert request['configuration']['params'][0]['value'] == PARAM_ID_A_VALUE
@@ -95,6 +98,7 @@ def test_step_should_create_an_asset_request(behave_context):
     with_status(behave_context, 'pending')
     with_product_id(behave_context, 'PRD-000-000-000')
     with_marketplace_id(behave_context, 'MP-00000')
+    with_connection_id(behave_context, 'CT-0000-0000-0000', 'test')
     with_asset_tier_customer(behave_context, 'TA-0000-0000-0000')
     with_asset_tier_tier1(behave_context, 'TA-0000-0000-0001')
     with_asset_tier_tier2(behave_context, 'TA-0000-0000-0002')
@@ -110,6 +114,8 @@ def test_step_should_create_an_asset_request(behave_context):
     assert request['type'] == 'purchase'
     assert request['asset']['product']['id'] == 'PRD-000-000-000'
     assert request['asset']['marketplace']['id'] == 'MP-00000'
+    assert request['asset']['connection']['id'] == 'CT-0000-0000-0000'
+    assert request['asset']['connection']['type'] == 'test'
     assert request['asset']['tiers']['customer']['id'] == 'TA-0000-0000-0000'
     assert request['asset']['tiers']['tier1']['id'] == 'TA-0000-0000-0001'
     assert request['asset']['tiers']['tier2']['id'] == 'TA-0000-0000-0002'
