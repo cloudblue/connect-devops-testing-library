@@ -8,7 +8,8 @@ from connect.devops_testing.bdd.steps import (
     subscription_request_is_processed, tier_configuration_request_is_processed, parameter_value_contains,
     parameter_value_error_contains, parameter_value_match, parameter_value_error_match, with_parameter_checked,
     with_parameter_not_checked, with_parameter_without_value, with_parameter_without_value_error,
-    with_asset_tier_customer, with_asset_tier_tier1, with_asset_tier_tier2, with_connection_id,
+    with_asset_tier_customer, with_asset_tier_tier1, with_asset_tier_tier2, with_connection_id, with_item_quantity,
+    with_items, request_note_is, request_reason_is, with_note, with_reason,
 )
 
 PARAM_ID_A = 'PARAM_ID_A'
@@ -19,6 +20,20 @@ PARAM_ID_CHECK_VALUE = 'a|b|c'
 PARAM_ID_CHECK_VALUE_NOT = 'a'
 PARAM_ID_NO_VALUE = 'PARAM_ID_NO_VALUE'
 PATTERN = r'^S[\s\w]*A$'
+NOTE = 'Some note'
+REASON = 'Some reason'
+
+
+def _shared_assert_steps(behave_context):
+    request_note_is(behave_context, NOTE)
+    request_reason_is(behave_context, REASON)
+    parameter_value_is(behave_context, PARAM_ID_A, PARAM_ID_A_VALUE)
+    parameter_value_contains(behave_context, PARAM_ID_A, 'value')
+    parameter_value_match(behave_context, PARAM_ID_A, PATTERN)
+    parameter_value_error_is(behave_context, PARAM_ID_A, PARAM_ID_A_VALUE_ERROR)
+    parameter_value_error_contains(behave_context, PARAM_ID_A, 'error')
+    parameter_value_error_match(behave_context, PARAM_ID_A, PATTERN)
+    parameter_value_is(behave_context, PARAM_ID_CHECK, 'b|c')
 
 
 def test_step_should_raise_exception_on_undefined_request_type(behave_context):
@@ -34,6 +49,8 @@ def test_step_should_create_a_tier_configuration_request(behave_context):
 
     tier_config_request(behave_context)
     with_id(behave_context, 'TCR-000-000-000-000')
+    with_note(behave_context, NOTE)
+    with_reason(behave_context, REASON)
     with_status(behave_context, 'pending')
     with_product_id(behave_context, 'PRD-000-000-000')
     with_marketplace_id(behave_context, 'MP-00000')
@@ -50,6 +67,8 @@ def test_step_should_create_a_tier_configuration_request(behave_context):
     assert request['id'] == 'TCR-000-000-000-000'
     assert request['status'] == 'pending'
     assert request['type'] == 'setup'
+    assert request['note'] == NOTE
+    assert request['reason'] == REASON
     assert request['configuration']['product']['id'] == 'PRD-000-000-000'
     assert request['configuration']['account']['id'] == 'TA-0000-0000-0000'
     assert request['configuration']['marketplace']['id'] == 'MP-00000'
@@ -72,6 +91,8 @@ def test_step_should_assert_successfully_a_tier_configuration_request(behave_con
 
     tier_config_request(behave_context)
     with_id(behave_context, 'TCR-000-000-000-000')
+    with_note(behave_context, NOTE)
+    with_reason(behave_context, REASON)
     with_status(behave_context, 'approved')
     with_parameter_with_value(behave_context, PARAM_ID_A, PARAM_ID_A_VALUE)
     with_parameter_with_value_error(behave_context, PARAM_ID_A, PARAM_ID_A_VALUE_ERROR)
@@ -81,48 +102,70 @@ def test_step_should_assert_successfully_a_tier_configuration_request(behave_con
     behave_context.request = behave_context.builder.build()
 
     request_status_is(behave_context, 'approved')
-    parameter_value_is(behave_context, PARAM_ID_A, PARAM_ID_A_VALUE)
-    parameter_value_contains(behave_context, PARAM_ID_A, 'value')
-    parameter_value_match(behave_context, PARAM_ID_A, PATTERN)
-    parameter_value_error_is(behave_context, PARAM_ID_A, PARAM_ID_A_VALUE_ERROR)
-    parameter_value_error_contains(behave_context, PARAM_ID_A, 'error')
-    parameter_value_error_match(behave_context, PARAM_ID_A, PATTERN)
-    parameter_value_is(behave_context, PARAM_ID_CHECK, 'b|c')
+    _shared_assert_steps(behave_context)
 
 
 def test_step_should_create_an_asset_request(behave_context):
-    use_connect_request_builder(context=behave_context)
+    use_connect_request_builder(
+        context=behave_context,
+        parameters={'PARAM_ID_A': PARAM_ID_A},
+        values={'PARAM_ID_A_VALUE': PARAM_ID_A_VALUE},
+        shared={'CONNECTION_ID': 'CT-0000-0000-0000'},
+    )
 
     asset_request(behave_context)
     with_id(behave_context, 'PR-000-000-000-000')
     with_status(behave_context, 'pending')
     with_product_id(behave_context, 'PRD-000-000-000')
+    with_note(behave_context, NOTE)
+    with_reason(behave_context, REASON)
     with_marketplace_id(behave_context, 'MP-00000')
-    with_connection_id(behave_context, 'CT-0000-0000-0000', 'test')
+    with_connection_id(behave_context, 'CONNECTION_ID', 'test')
     with_asset_tier_customer(behave_context, 'TA-0000-0000-0000')
     with_asset_tier_tier1(behave_context, 'TA-0000-0000-0001')
     with_asset_tier_tier2(behave_context, 'TA-0000-0000-0002')
-    with_parameter_with_value(behave_context, PARAM_ID_A, PARAM_ID_A_VALUE)
+    with_parameter_with_value(behave_context, 'PARAM_ID_A', 'PARAM_ID_A_VALUE')
     with_parameter_with_value_error(behave_context, PARAM_ID_A, PARAM_ID_A_VALUE_ERROR)
     with_parameter_without_value(behave_context, PARAM_ID_NO_VALUE)
     with_parameter_without_value_error(behave_context, PARAM_ID_NO_VALUE)
+    with_item_quantity(behave_context, 'ITEM_ID_001', 'ITEM_MPN_001', '41')
+
+    behave_context.table = [
+        {'item': 'ITEM_ID_002', 'mpn': 'ITEM_MPN_002', 'quantity': '42'},
+        {'item': 'ITEM_ID_003', 'mpn': 'ITEM_MPN_003', 'quantity': '43'}
+    ]
+    with_items(behave_context)
 
     request = behave_context.builder.build()
 
     assert request['id'] == 'PR-000-000-000-000'
     assert request['status'] == 'pending'
     assert request['type'] == 'purchase'
+    assert request['note'] == NOTE
+    assert request['reason'] == REASON
     assert request['asset']['product']['id'] == 'PRD-000-000-000'
     assert request['asset']['marketplace']['id'] == 'MP-00000'
     assert request['asset']['connection']['id'] == 'CT-0000-0000-0000'
     assert request['asset']['connection']['type'] == 'test'
     assert request['asset']['tiers']['customer']['id'] == 'TA-0000-0000-0000'
+    assert  'type' not in request['asset']['tiers']['customer']
     assert request['asset']['tiers']['tier1']['id'] == 'TA-0000-0000-0001'
+    assert  'type' not in request['asset']['tiers']['tier1']
     assert request['asset']['tiers']['tier2']['id'] == 'TA-0000-0000-0002'
+    assert  'type' not in request['asset']['tiers']['tier2']
     assert request['asset']['params'][0]['id'] == PARAM_ID_A
     assert request['asset']['params'][0]['value'] == PARAM_ID_A_VALUE
     assert request['asset']['params'][0]['value_error'] == PARAM_ID_A_VALUE_ERROR
     assert request['asset']['params'][1]['id'] == PARAM_ID_NO_VALUE
+    assert request['asset']['items'][0]['id'] == 'ITEM_ID_001'
+    assert request['asset']['items'][0]['mpn'] == 'ITEM_MPN_001'
+    assert request['asset']['items'][0]['quantity'] == '41'
+    assert request['asset']['items'][1]['id'] == 'ITEM_ID_002'
+    assert request['asset']['items'][1]['mpn'] == 'ITEM_MPN_002'
+    assert request['asset']['items'][1]['quantity'] == '42'
+    assert request['asset']['items'][2]['id'] == 'ITEM_ID_003'
+    assert request['asset']['items'][2]['mpn'] == 'ITEM_MPN_003'
+    assert request['asset']['items'][2]['quantity'] == '43'
     assert 'value' not in request['asset']['params'][1]
     assert 'value_error' not in request['asset']['params'][1]
 
@@ -133,6 +176,8 @@ def test_step_should_assert_successfully_an_asset_request(behave_context):
     asset_request(behave_context)
     with_id(behave_context, 'PR-000-000-000-000')
     with_status(behave_context, 'pending')
+    with_note(behave_context, NOTE)
+    with_reason(behave_context, REASON)
     with_parameter_with_value(behave_context, PARAM_ID_A, PARAM_ID_A_VALUE)
     with_parameter_with_value_error(behave_context, PARAM_ID_A, PARAM_ID_A_VALUE_ERROR)
     with_parameter_checked(behave_context, PARAM_ID_CHECK, PARAM_ID_CHECK_VALUE)
@@ -141,13 +186,7 @@ def test_step_should_assert_successfully_an_asset_request(behave_context):
     behave_context.request = behave_context.builder.build()
 
     request_status_is(behave_context, 'pending')
-    parameter_value_is(behave_context, PARAM_ID_A, PARAM_ID_A_VALUE)
-    parameter_value_contains(behave_context, PARAM_ID_A, 'value')
-    parameter_value_match(behave_context, PARAM_ID_A, PATTERN)
-    parameter_value_error_is(behave_context, PARAM_ID_A, PARAM_ID_A_VALUE_ERROR)
-    parameter_value_error_contains(behave_context, PARAM_ID_A, 'error')
-    parameter_value_error_match(behave_context, PARAM_ID_A, PATTERN)
-    parameter_value_is(behave_context, PARAM_ID_CHECK, 'b|c')
+    _shared_assert_steps(behave_context)
 
 
 def test_step_should_successfully_process_the_request(sync_client_factory, response_factory, behave_context):

@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Any, Callable, Optional
 
 from behave import fixture
 from behave.runner import Context
@@ -58,16 +58,33 @@ def use_connect_request_store(context: Context, store: Optional[dict] = None, re
 
 
 @fixture
-def use_connect_request_builder(context: Context, parameters: Optional[dict] = None):
+def use_connect_request_builder(
+        context: Context,
+        parameters: Optional[dict] = None,
+        values: Optional[dict] = None,
+        shared: Optional[dict] = None,
+):
     """
     Provides a connect request builder into the behave Context object.
 
     :param context: Context
     :param parameters: Optional[dict] Key-Value dictionary with the key as
                        param name and value as param id.
+    :param values: Optional[dict] Key-Value dictionary with replaces for the values.
+    :param shared: Optional[dict] Key-Value dictionary with replaces for the shared values.
     :return: None
     """
-    parameters = {} if parameters is None else parameters
 
-    context.parameter = lambda name: parameters.get(name, name)
+    def _make_kv_repository(dictionary: Optional[dict]) -> Callable[[str], Any]:
+        dictionary = {} if dictionary is None else dictionary
+
+        def _find_by_key(key: str) -> Any:
+            return dictionary.get(key, key)
+
+        return _find_by_key
+
+    context.parameter = _make_kv_repository(parameters)
+    context.value = _make_kv_repository(values)
+    context.shared = _make_kv_repository(shared)
+
     context.builder = make_request_builder()
