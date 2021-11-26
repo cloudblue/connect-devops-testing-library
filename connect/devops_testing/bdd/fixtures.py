@@ -44,16 +44,17 @@ def use_connect_request_dispatcher(
 
 
 @fixture
-def use_connect_request_store(context: Context, reset: bool = False):
+def use_connect_request_store(context: Context, store: Optional[dict] = None, reset: bool = False):
     """
     Provides a simple way initialize (or reset) the request store.
 
     :param context: Context
+    :param store: dict Provide the initial state of the store.
     :param reset: bool True to reset the request store.
     :return: None
     """
     if not hasattr(context, 'request') or reset:
-        context.request = {}
+        context.request = {} if store is None else store
 
 
 @fixture
