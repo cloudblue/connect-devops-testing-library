@@ -26,8 +26,6 @@ def _request_is_process(context: Context):
 
     context.request.update(context.connect.provision_request(
         request=context.builder.build(),
-        timeout=context.timeout,
-        max_attempt=context.max_attempts,
     ))
 
 
@@ -133,6 +131,17 @@ def with_marketplace_id(context: Context, marketplace_id: str):
     )
 
     handler(marketplace_id=marketplace_id)
+
+
+@step('request with connection "{connection_id}" of type "{connection_type}"')
+def with_connection_id(context: Context, connection_id: str, connection_type: str):
+    handler = _get_request_handler(
+        asset=context.builder.with_asset_connection,
+        tier_config=context.builder.with_tier_configuration_connection,
+        request_type=context.builder.request_type(),
+    )
+
+    handler(connection_id=connection_id, connection_type=connection_type)
 
 
 @step('request with reseller level "{level}"')

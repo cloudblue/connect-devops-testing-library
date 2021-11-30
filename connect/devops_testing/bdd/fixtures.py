@@ -14,8 +14,8 @@ def use_connect_request_dispatcher(
         api_url: Optional[str] = None,
         use_specs: bool = True,
         client: ConnectClient = None,
-        timeout: int = 10,
-        max_attempts: int = 20,
+        timeout: Optional[int] = None,
+        max_attempts: Optional[int] = None,
 ):
     """
     Provides a connect request provider into the behave Context object.
@@ -36,9 +36,9 @@ def use_connect_request_dispatcher(
         api_url=api_url,
         use_specs=use_specs,
         client=client,
+        timeout=timeout,
+        max_attempts=max_attempts,
     )
-    context.timeout = timeout
-    context.max_attempts = max_attempts
 
     use_connect_request_store(context)
 
