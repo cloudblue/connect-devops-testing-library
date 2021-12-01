@@ -90,6 +90,7 @@ class Builder:
         return {
             "name": self._fake.company(),
             "type": tier_type,
+            "external_id": f"1000182{self._fake.pyint(1000000, 9999999)}",
             "external_uid": f"{self._fake.uuid4()}",
             "contact_info": {
                 "address_line1": f"{self._fake.pyint(100, 999)}, {self._fake.street_name()}",
@@ -97,7 +98,7 @@ class Builder:
                 "city": self._fake.city(),
                 "state": self._fake.state(),
                 "postal_code": self._fake.zipcode(),
-                "country": self._fake.country(),
+                "country": self._fake.country_code(),
                 "contact": {
                     "first_name": self._fake.first_name(),
                     "last_name": self._fake.last_name(),
@@ -146,6 +147,14 @@ class Builder:
         self._request = merge(self._request, {'id': request_id})
         return self
 
+    def with_note(self, note: str) -> Builder:
+        self._request = merge(self._request, {'note': note})
+        return self
+
+    def with_reason(self, reason: str) -> Builder:
+        self._request = merge(self._request, {'reason': reason})
+        return self
+
     def with_status(self, request_status) -> Builder:
         self._request = merge(self._request, {'status': request_status})
         return self
@@ -175,19 +184,19 @@ class Builder:
 
     def with_asset_tier_customer(self, customer_id: str) -> Builder:
         customer = self._make_tier('customer') if customer_id == 'random' else {'id': customer_id}
-
+        self._request.get('asset', {}).get('tiers', {}).get('customer', {}).clear()
         self._request = merge(self._request, {'asset': {'tiers': {'customer': customer}}})
         return self
 
     def with_asset_tier_tier1(self, tier1_id: str) -> Builder:
         tier1 = self._make_tier('reseller') if tier1_id == 'random' else {'id': tier1_id}
-
+        self._request.get('asset', {}).get('tiers', {}).get('tier1', {}).clear()
         self._request = merge(self._request, {'asset': {'tiers': {'tier1': tier1}}})
         return self
 
     def with_asset_tier_tier2(self, tier2_id: str) -> Builder:
         tier2 = self._make_tier('reseller') if tier2_id == 'random' else {'id': tier2_id}
-
+        self._request.get('asset', {}).get('tiers', {}).get('tier2', {}).clear()
         self._request = merge(self._request, {'asset': {'tiers': {'tier2': tier2}}})
         return self
 
@@ -219,10 +228,10 @@ class Builder:
             item_id: str,
             item_mpn: str,
             quantity: str = '1',
-            old_quantity: str = '0',
-            item_type: str = 'Reservation',
-            period: str = 'Yearly',
-            unit: str = 'Licenses',
+            old_quantity: Optional[str] = None,
+            item_type: Optional[str] = None,
+            period: Optional[str] = None,
+            unit: Optional[str] = None,
             display_name: Optional[str] = None,
     ) -> Builder:
         item = find_by_id(self._request.get('asset', {}).get('items', []), item_id)
@@ -230,8 +239,8 @@ class Builder:
             item = {'id': item_id}
             self._request = merge(self._request, {'asset': {'items': [item]}})
 
-        item.update({
-            'display_name': item_id if display_name is None else display_name,
+        members = {
+            'display_name': display_name,
             'mpn': item_mpn,
             'quantity': quantity,
             'old_quantity': old_quantity,
@@ -239,7 +248,9 @@ class Builder:
             'item_type': item_type,
             'period': period,
             'type': unit,
-        })
+        }
+
+        item.update({k: v for k, v in members.items() if v is not None})
         return self
 
     def with_asset_item_param(
