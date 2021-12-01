@@ -129,6 +129,15 @@ def with_asset_tier_tier2(context: Context, tier2_id: str):
     context.builder.with_asset_tier_tier2(context.shared(tier2_id))
 
 
+@step('request with asset "{tier}" from country "{country}"')
+def with_asset_tier_from_country(context: Context, tier: str, country: str):
+    context.builder.with_asset_tier(tier_name=tier, tier={
+        "contact_info": {
+            "country": context.shared(country),
+        },
+    })
+
+
 @step('request with product "{product_id}"')
 def with_product_id(context: Context, product_id: str):
     handler = _get_request_handler(
