@@ -182,23 +182,22 @@ class Builder:
         }}})
         return self
 
-    def with_asset_tier_customer(self, customer_id: str) -> Builder:
-        customer = self._make_tier('customer') if customer_id == 'random' else {'id': customer_id}
-        self._request.get('asset', {}).get('tiers', {}).get('customer', {}).clear()
-        self._request = merge(self._request, {'asset': {'tiers': {'customer': customer}}})
+    def with_asset_tier(self, tier_name: str, tier: Union[str, dict]):
+        if isinstance(tier, str):
+            self._request.get('asset', {}).get('tiers', {}).get(tier_name, {}).clear()
+            tier = self._make_tier(tier_name) if tier == 'random' else {'id': tier}
+
+        self._request = merge(self._request, {'asset': {'tiers': {tier_name: tier}}})
         return self
 
-    def with_asset_tier_tier1(self, tier1_id: str) -> Builder:
-        tier1 = self._make_tier('reseller') if tier1_id == 'random' else {'id': tier1_id}
-        self._request.get('asset', {}).get('tiers', {}).get('tier1', {}).clear()
-        self._request = merge(self._request, {'asset': {'tiers': {'tier1': tier1}}})
-        return self
+    def with_asset_tier_customer(self, customer_id: Union[str, dict]) -> Builder:
+        return self.with_asset_tier('customer', customer_id)
 
-    def with_asset_tier_tier2(self, tier2_id: str) -> Builder:
-        tier2 = self._make_tier('reseller') if tier2_id == 'random' else {'id': tier2_id}
-        self._request.get('asset', {}).get('tiers', {}).get('tier2', {}).clear()
-        self._request = merge(self._request, {'asset': {'tiers': {'tier2': tier2}}})
-        return self
+    def with_asset_tier_tier1(self, tier1_id: Union[str, dict]) -> Builder:
+        return self.with_asset_tier('tier1', tier1_id)
+
+    def with_asset_tier_tier2(self, tier2_id: Union[str, dict]) -> Builder:
+        return self.with_asset_tier('tier2', tier2_id)
 
     def with_asset_param(
             self,

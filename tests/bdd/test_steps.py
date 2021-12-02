@@ -9,7 +9,7 @@ from connect.devops_testing.bdd.steps import (
     parameter_value_error_contains, parameter_value_match, parameter_value_error_match, with_parameter_checked,
     with_parameter_not_checked, with_parameter_without_value, with_parameter_without_value_error,
     with_asset_tier_customer, with_asset_tier_tier1, with_asset_tier_tier2, with_connection_id, with_item_quantity,
-    with_items, request_note_is, request_reason_is, with_note, with_reason,
+    with_items, request_note_is, request_reason_is, with_note, with_reason, with_asset_tier_from_country,
 )
 
 PARAM_ID_A = 'PARAM_ID_A'
@@ -121,7 +121,8 @@ def test_step_should_create_an_asset_request(behave_context):
     with_reason(behave_context, REASON)
     with_marketplace_id(behave_context, 'MP-00000')
     with_connection_id(behave_context, 'CONNECTION_ID', 'test')
-    with_asset_tier_customer(behave_context, 'TA-0000-0000-0000')
+    with_asset_tier_customer(behave_context, 'random')
+    with_asset_tier_from_country(behave_context, 'customer', 'US')
     with_asset_tier_tier1(behave_context, 'TA-0000-0000-0001')
     with_asset_tier_tier2(behave_context, 'TA-0000-0000-0002')
     with_parameter_with_value(behave_context, 'PARAM_ID_A', 'PARAM_ID_A_VALUE')
@@ -147,8 +148,9 @@ def test_step_should_create_an_asset_request(behave_context):
     assert request['asset']['marketplace']['id'] == 'MP-00000'
     assert request['asset']['connection']['id'] == 'CT-0000-0000-0000'
     assert request['asset']['connection']['type'] == 'test'
-    assert request['asset']['tiers']['customer']['id'] == 'TA-0000-0000-0000'
-    assert  'type' not in request['asset']['tiers']['customer']
+    assert  'id' not in request['asset']['tiers']['customer']
+    assert  'contact' in request['asset']['tiers']['customer']['contact_info']
+    assert request['asset']['tiers']['customer']['contact_info']['country'] == 'US'
     assert request['asset']['tiers']['tier1']['id'] == 'TA-0000-0000-0001'
     assert  'type' not in request['asset']['tiers']['tier1']
     assert request['asset']['tiers']['tier2']['id'] == 'TA-0000-0000-0002'
