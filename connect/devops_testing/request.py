@@ -90,7 +90,7 @@ class Builder:
         return {
             "name": self._fake.company(),
             "type": tier_type,
-            "external_id": f"1000182{self._fake.pyint(1000000, 9999999)}",
+            "external_id": f"{self._fake.pyint(1000000, 9999999)}",
             "external_uid": f"{self._fake.uuid4()}",
             "contact_info": {
                 "address_line1": f"{self._fake.pyint(100, 999)}, {self._fake.street_name()}",
