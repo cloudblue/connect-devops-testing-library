@@ -10,6 +10,7 @@ from connect.devops_testing.bdd.steps import (
     with_parameter_not_checked, with_parameter_without_value, with_parameter_without_value_error,
     with_asset_tier_customer, with_asset_tier_tier1, with_asset_tier_tier2, with_connection_id, with_item_quantity,
     with_items, request_note_is, request_reason_is, with_note, with_reason, with_asset_tier_from_country,
+    with_asset_external_id, with_asset_external_uid,
 )
 
 PARAM_ID_A = 'PARAM_ID_A'
@@ -121,6 +122,8 @@ def test_step_should_create_an_asset_request(behave_context):
     with_reason(behave_context, REASON)
     with_marketplace_id(behave_context, 'MP-00000')
     with_connection_id(behave_context, 'CONNECTION_ID', 'test')
+    with_asset_external_id(behave_context, '123456789')
+    with_asset_external_uid(behave_context, '9fb50525-a4a4-41a7-ace0-dc3c73796d32')
     with_asset_tier_customer(behave_context, 'random')
     with_asset_tier_from_country(behave_context, 'customer', 'US')
     with_asset_tier_tier1(behave_context, 'TA-0000-0000-0001')
@@ -144,17 +147,19 @@ def test_step_should_create_an_asset_request(behave_context):
     assert request['type'] == 'purchase'
     assert request['note'] == NOTE
     assert request['reason'] == REASON
+    assert request['asset']['external_id'] == '123456789'
+    assert request['asset']['external_uid'] == '9fb50525-a4a4-41a7-ace0-dc3c73796d32'
     assert request['asset']['product']['id'] == 'PRD-000-000-000'
     assert request['asset']['marketplace']['id'] == 'MP-00000'
     assert request['asset']['connection']['id'] == 'CT-0000-0000-0000'
     assert request['asset']['connection']['type'] == 'test'
-    assert  'id' not in request['asset']['tiers']['customer']
-    assert  'contact' in request['asset']['tiers']['customer']['contact_info']
+    assert 'id' not in request['asset']['tiers']['customer']
+    assert 'contact' in request['asset']['tiers']['customer']['contact_info']
     assert request['asset']['tiers']['customer']['contact_info']['country'] == 'US'
     assert request['asset']['tiers']['tier1']['id'] == 'TA-0000-0000-0001'
-    assert  'type' not in request['asset']['tiers']['tier1']
+    assert 'type' not in request['asset']['tiers']['tier1']
     assert request['asset']['tiers']['tier2']['id'] == 'TA-0000-0000-0002'
-    assert  'type' not in request['asset']['tiers']['tier2']
+    assert 'type' not in request['asset']['tiers']['tier2']
     assert request['asset']['params'][0]['id'] == PARAM_ID_A
     assert request['asset']['params'][0]['value'] == PARAM_ID_A_VALUE
     assert request['asset']['params'][0]['value_error'] == PARAM_ID_A_VALUE_ERROR

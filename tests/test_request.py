@@ -40,6 +40,8 @@ def test_request_builder_should_build_successfully_a_valid_asset_request():
                .with_type('purchase')
                .with_status('approved')
                .with_id('PR-0000-0000-0000-100')
+               .with_asset_external_id('123456789')
+               .with_asset_external_uid('9fb50525-a4a4-41a7-ace0-dc3c73796d32')
                .with_asset_product('PRD-000-000-100', 'disabled')
                .with_asset_id('AS-0000-0000-1000')
                .with_asset_status('active')
@@ -66,6 +68,9 @@ def test_request_builder_should_build_successfully_a_valid_asset_request():
 
     assert request['asset']['id'] == 'AS-0000-0000-1000'
     assert request['asset']['status'] == 'active'
+
+    assert request['asset']['external_id'] == '123456789'
+    assert request['asset']['external_uid'] == '9fb50525-a4a4-41a7-ace0-dc3c73796d32'
 
     assert request['asset']['marketplace']['id'] == 'MP-12345'
 

@@ -163,6 +163,16 @@ class Builder:
         self._request = merge(self._request, {'asset': {'id': asset_id}})
         return self
 
+    def with_asset_external_id(self, external_id: str = 'random') -> Builder:
+        external_id = f"{self._fake.pyint(1000000, 9999999)}" if external_id == 'random' else external_id
+        self._request = merge(self._request, {'asset': {'external_id': external_id}})
+        return self
+
+    def with_asset_external_uid(self, external_uid: str = 'random') -> Builder:
+        external_uid = f"{self._fake.uuid4()}" if external_uid == 'random' else external_uid
+        self._request = merge(self._request, {'asset': {'external_uid': external_uid}})
+        return self
+
     def with_asset_status(self, asset_status: str) -> Builder:
         self._request = merge(self._request, {'asset': {'status': asset_status}})
         return self
