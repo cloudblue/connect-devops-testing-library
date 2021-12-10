@@ -65,6 +65,7 @@ def test_request_builder_should_build_successfully_a_valid_asset_request():
     assert request['id'] == 'PR-0000-0000-0000-100'
     assert request['type'] == 'purchase'
     assert request['status'] == 'approved'
+    assert request['marketplace']['id'] == 'MP-12345'
 
     assert request['asset']['id'] == 'AS-0000-0000-1000'
     assert request['asset']['status'] == 'active'
@@ -127,6 +128,7 @@ def test_request_builder_should_build_successfully_a_valid_tier_config_request()
     assert request['id'] == 'TCR-000-000-000-100'
     assert request['type'] == 'setup'
     assert request['status'] == 'approved'
+    assert request['marketplace']['id'] == 'MP-12345'
 
     assert request['configuration']['id'] == 'TC-000-000-000'
     assert request['configuration']['status'] == 'active'
