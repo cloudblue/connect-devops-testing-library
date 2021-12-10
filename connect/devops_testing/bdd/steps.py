@@ -114,6 +114,16 @@ def with_tier_config_account(context: Context, account_id: str):
     context.builder.with_tier_configuration_account(context.shared(account_id))
 
 
+@step('request with asset external id "{external_id}"')
+def with_asset_external_id(context: Context, external_id: str):
+    context.builder.with_asset_external_id(context.shared(external_id))
+
+
+@step('request with asset external uid "{external_uid}"')
+def with_asset_external_uid(context: Context, external_uid: str):
+    context.builder.with_asset_external_uid(context.shared(external_uid))
+
+
 @step('request with asset customer "{customer_id}"')
 def with_asset_tier_customer(context: Context, customer_id: str):
     context.builder.with_asset_tier_customer(context.shared(customer_id))
