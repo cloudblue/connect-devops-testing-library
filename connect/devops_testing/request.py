@@ -159,6 +159,33 @@ class Builder:
         self._request = merge(self._request, {'status': request_status})
         return self
 
+    def with_param(
+            self,
+            param_id: str,
+            value: Optional[Union[str, dict]] = None,
+            value_error: Optional[str] = None,
+            value_type: str = 'text',
+    ) -> Builder:
+        param = find_by_id(self._request.get('params', []), param_id)
+
+        if param is None:
+            param = {
+                'id': param_id,
+                'name': param_id,
+                'title': f'Request parameter {param_id}',
+                'description': f'Request parameter description of {param_id}',
+                'type': value_type,
+            }
+            self._request = merge(self._request, {'params': [param]})
+
+        members = _param_members(param, value, value_error)
+        param.update({k: v for k, v in members.items() if v is not None})
+        return self
+
+    def with_marketplace(self, marketplace_id: str) -> Builder:
+        self._request = merge(self._request, {'marketplace': {'id': marketplace_id}})
+        return self
+
     def with_asset_id(self, asset_id: str) -> Builder:
         self._request = merge(self._request, {'asset': {'id': asset_id}})
         return self
@@ -183,7 +210,7 @@ class Builder:
 
     def with_asset_marketplace(self, marketplace_id: str) -> Builder:
         self._request = merge(self._request, {'asset': {'marketplace': {'id': marketplace_id}}})
-        return self
+        return self.with_marketplace(marketplace_id)
 
     def with_asset_connection(self, connection_id: str, connection_type: str):
         self._request = merge(self._request, {'asset': {'connection': {
@@ -326,7 +353,7 @@ class Builder:
 
     def with_tier_configuration_marketplace(self, marketplace_id: str) -> Builder:
         self._request = merge(self._request, {'configuration': {'marketplace': {'id': marketplace_id}}})
-        return self
+        return self.with_marketplace(marketplace_id)
 
     def with_tier_configuration_connection(self, connection_id: str, connection_type: str):
         self._request = merge(self._request, {'configuration': {'connection': {
@@ -352,33 +379,21 @@ class Builder:
             value_error: Optional[str] = None,
             value_type: str = 'text',
     ) -> Builder:
-        locations = [
-            (
-                lambda request: request.get('configuration', {}).get('params', []),
-                lambda parameter: {'configuration': {'params': [parameter]}},
-            ),
-            (
-                lambda request: request.get('params', []),
-                lambda parameter: {'params': [parameter]},
-            ),
-        ]
+        param = find_by_id(self._request.get('configuration', {}).get('params', []), param_id)
+        if param is None:
+            param = {
+                'id': param_id,
+                'name': param_id,
+                'title': f'Configuration parameter {param_id}',
+                'description': f'Configuration parameter description of {param_id}',
+                'type': value_type,
+            }
+            self._request = merge(self._request, {'configuration': {'params': [param]}})
 
-        for location in locations:
-            param = find_by_id(location[0](self._request), param_id)
-            if param is None:
-                param = {
-                    'id': param_id,
-                    'name': param_id,
-                    'title': f'Configuration parameter {param_id}',
-                    'description': f'Configuration parameter description of {param_id}',
-                    'type': value_type,
-                }
-                self._request = merge(self._request, location[1](param))
+        members = _param_members(param, value, value_error)
+        param.update({k: v for k, v in members.items() if v is not None})
 
-            members = _param_members(param, value, value_error)
-            param.update({k: v for k, v in members.items() if v is not None})
-
-        return self
+        return self.with_param(param_id, value, value_error, value_type)
 
     def with_tier_configuration_configuration_param(
             self,

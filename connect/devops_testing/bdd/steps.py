@@ -87,6 +87,8 @@ def asset_request(context: Context):
     context.builder = context.builder.from_default_asset()
     context.builder = context.builder.with_asset_tier_customer('random')
     context.builder = context.builder.with_asset_tier_tier1('random')
+    context.builder = context.builder.with_asset_external_id('random')
+    context.builder = context.builder.with_asset_external_uid('random')
 
 
 @step('request with id "{request_id}"')
