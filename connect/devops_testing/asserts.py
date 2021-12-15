@@ -4,6 +4,8 @@ from typing import Any, Optional, Tuple
 
 from connect.devops_testing.utils import find_by_id
 
+ASSERT_FAIL = 'Assertion failed.'
+
 __operators = {
     '==': operator.eq,
     '!=': operator.ne,
@@ -14,9 +16,9 @@ __operators = {
 
 def _prepare_assert_argument(param: dict, expected: Any) -> Tuple[Optional[Any], Any]:
     if param.get('type') == 'checkbox':
-        return [k for k, v in param.get('structured_value').items() if v], expected.split("|")
+        return [k for k, v in param.get('structured_value', {}).items() if v], expected.split("|")
     else:
-        return param.get('value'), expected
+        return param.get('value', ''), expected
 
 
 def request_status(request: dict, expected: str):
@@ -44,7 +46,7 @@ def asset_param_value(request: dict, param_id: str, operator: str, expected: Any
     fn = __operators.get(operator)
     param = find_by_id(request.get('asset', {}).get('params', []), param_id, {})
     value, expected = _prepare_assert_argument(param, expected)
-    assert fn(value, expected), 'Assertion failed.' if msg is None else msg.format(
+    assert fn(value, expected), ASSERT_FAIL if msg is None else msg.format(
         param_id=param_id,
         value=value,
         expected=expected,
@@ -74,8 +76,8 @@ def asset_param_value_contains(request: dict, param_id: str, expected: Any):
 def asset_param_value_error(request: dict, param_id: str, operator: str, expected: Any, msg: Optional[str] = None):
     fn = __operators.get(operator)
     param = find_by_id(request.get('asset', {}).get('params', []), param_id, {})
-    value = param.get('value_error')
-    assert fn(value, expected), 'Assertion failed.' if msg is None else msg.format(
+    value = param.get('value_error', '')
+    assert fn(value, expected), ASSERT_FAIL if msg is None else msg.format(
         param_id=param_id,
         value=value,
         expected=expected,
@@ -121,7 +123,7 @@ def tier_configuration_param_value(
         {},
     )
     value, expected = _prepare_assert_argument(param, expected)
-    assert fn(value, expected), 'Assertion failed.' if msg is None else msg.format(
+    assert fn(value, expected), ASSERT_FAIL if msg is None else msg.format(
         param_id=param_id,
         value=value,
         expected=expected,
@@ -161,8 +163,8 @@ def tier_configuration_param_value_error(
         param_id,
         {},
     )
-    value = param.get('value_error')
-    assert fn(value, expected), 'Assertion failed.' if msg is None else msg.format(
+    value = param.get('value_error', '')
+    assert fn(value, expected), ASSERT_FAIL if msg is None else msg.format(
         param_id=param_id,
         value=value,
         expected=expected,

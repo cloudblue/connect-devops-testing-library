@@ -24,9 +24,11 @@ def _request_is_process(context: Context):
     if isinstance(context.request, dict) and context.request.get('id') is not None:
         context.builder.with_id(context.request.get('id'))
 
+    context.request.update(context.builder.build())
     context.request.update(context.connect.provision_request(
-        request=context.builder.build(),
+        request=context.request,
     ))
+    print(f"Processed request id: {context.request.get('id')}")
 
 
 def _with_checkbox_parameter(context: Context, parameter: str, values: str, checked: bool):
