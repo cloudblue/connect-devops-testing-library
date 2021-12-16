@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from abc import abstractmethod
 from copy import deepcopy
-from typing import Optional, Union
+from typing import List, Optional, Union
 
 from connect.client import ConnectClient
 from connect.devops_testing.utils import find_by_id, merge, request_model, request_parameters
@@ -159,6 +159,11 @@ class Builder:
         self._request = merge(self._request, {'status': request_status})
         return self
 
+    def with_params(self, params: List[dict]) -> Builder:
+        for param in params:
+            self.with_param(**param)
+        return self
+
     def with_param(
             self,
             param_id: str,
@@ -212,14 +217,58 @@ class Builder:
         self._request = merge(self._request, {'asset': {'marketplace': {'id': marketplace_id}}})
         return self.with_marketplace(marketplace_id)
 
-    def with_asset_connection(self, connection_id: str, connection_type: str):
+    def with_asset_connection(
+            self,
+            connection_id: str,
+            connection_type: str,
+            provider: Optional[dict] = None,
+            vendor: Optional[dict] = None,
+            hub: Optional[dict] = None,
+    ) -> Builder:
         self._request = merge(self._request, {'asset': {'connection': {
             'id': connection_id,
             'type': connection_type,
         }}})
+        if provider is not None:
+            self.with_asset_connection_provider(
+                provider_id=provider.get('id'),
+                provider_name=provider.get('name'),
+            )
+        if vendor is not None:
+            self.with_asset_connection_vendor(
+                vendor_id=vendor.get('id'),
+                vendor_name=vendor.get('name'),
+            )
+        if hub is not None:
+            self.with_asset_connection_hub(
+                hub_id=hub.get('id'),
+                hub_name=hub.get('name'),
+            )
+
         return self
 
-    def with_asset_tier(self, tier_name: str, tier: Union[str, dict]):
+    def with_asset_connection_provider(self, provider_id: str, provider_name: Optional[str] = None) -> Builder:
+        self._request = merge(self._request, {'asset': {'connection': {'provider': {
+            'id': provider_id,
+            'name': provider_name,
+        }}}})
+        return self
+
+    def with_asset_connection_vendor(self, vendor_id: str, vendor_name: Optional[str] = None) -> Builder:
+        self._request = merge(self._request, {'asset': {'connection': {'vendor': {
+            'id': vendor_id,
+            'name': vendor_name,
+        }}}})
+        return self
+
+    def with_asset_connection_hub(self, hub_id: str, hub_name: Optional[str] = None) -> Builder:
+        self._request = merge(self._request, {'asset': {'connection': {'hub': {
+            'id': hub_id,
+            'name': hub_name,
+        }}}})
+        return self
+
+    def with_asset_tier(self, tier_name: str, tier: Union[str, dict]) -> Builder:
         if isinstance(tier, str):
             self._request.get('asset', {}).get('tiers', {}).get(tier_name, {}).clear()
             tier = self._make_tier(tier_name) if tier == 'random' else {'id': tier}
@@ -235,6 +284,11 @@ class Builder:
 
     def with_asset_tier_tier2(self, tier2_id: Union[str, dict]) -> Builder:
         return self.with_asset_tier('tier2', tier2_id)
+
+    def with_asset_params(self, params: List[dict]) -> Builder:
+        for param in params:
+            self.with_asset_param(**param)
+        return self
 
     def with_asset_param(
             self,
@@ -259,6 +313,11 @@ class Builder:
         param.update({k: v for k, v in members.items() if v is not None})
         return self
 
+    def with_asset_items(self, items: List[dict]) -> Builder:
+        for item in items:
+            self.with_asset_item(**item)
+        return self
+
     def with_asset_item(
             self,
             item_id: str,
@@ -269,6 +328,8 @@ class Builder:
             period: Optional[str] = None,
             unit: Optional[str] = None,
             display_name: Optional[str] = None,
+            global_id: Optional[str] = None,
+            params: Optional[List[dict]] = None,
     ) -> Builder:
         item = find_by_id(self._request.get('asset', {}).get('items', []), item_id)
         if item is None:
@@ -276,6 +337,7 @@ class Builder:
             self._request = merge(self._request, {'asset': {'items': [item]}})
 
         members = {
+            'global_id': global_id,
             'display_name': display_name,
             'mpn': item_mpn,
             'quantity': quantity,
@@ -287,6 +349,12 @@ class Builder:
         }
 
         item.update({k: v for k, v in members.items() if v is not None})
+        self.with_asset_item_params(item_id, [] if params is None else params)
+        return self
+
+    def with_asset_item_params(self, item_id: str, params: List[dict]) -> Builder:
+        for param in params:
+            self.with_asset_item_param(**{'item_id': item_id, **param})
         return self
 
     def with_asset_item_param(
@@ -314,6 +382,11 @@ class Builder:
             item['params'].append(param)
 
         param.update({'value': value})
+        return self
+
+    def with_asset_configuration_params(self, params: List[dict]) -> Builder:
+        for param in params:
+            self.with_asset_configuration_param(**param)
         return self
 
     def with_asset_configuration_param(
@@ -355,11 +428,58 @@ class Builder:
         self._request = merge(self._request, {'configuration': {'marketplace': {'id': marketplace_id}}})
         return self.with_marketplace(marketplace_id)
 
-    def with_tier_configuration_connection(self, connection_id: str, connection_type: str):
+    def with_tier_configuration_connection(
+            self,
+            connection_id: str,
+            connection_type: str,
+            provider: Optional[dict] = None,
+            vendor: Optional[dict] = None,
+            hub: Optional[dict] = None,
+    ) -> Builder:
         self._request = merge(self._request, {'configuration': {'connection': {
             'id': connection_id,
             'type': connection_type,
         }}})
+        if provider is not None:
+            self.with_tier_configuration_connection_provider(
+                provider_id=provider.get('id'),
+                provider_name=provider.get('name'),
+            )
+        if vendor is not None:
+            self.with_tier_configuration_connection_vendor(
+                vendor_id=vendor.get('id'),
+                vendor_name=vendor.get('name'),
+            )
+        if hub is not None:
+            self.with_tier_configuration_connection_hub(
+                hub_id=hub.get('id'),
+                hub_name=hub.get('name'),
+            )
+        return self
+
+    def with_tier_configuration_connection_provider(
+            self,
+            provider_id: str,
+            provider_name: Optional[str] = None,
+    ) -> Builder:
+        self._request = merge(self._request, {'configuration': {'connection': {'provider': {
+            'id': provider_id,
+            'name': provider_name,
+        }}}})
+        return self
+
+    def with_tier_configuration_connection_vendor(self, vendor_id: str, vendor_name: Optional[str] = None) -> Builder:
+        self._request = merge(self._request, {'configuration': {'connection': {'vendor': {
+            'id': vendor_id,
+            'name': vendor_name,
+        }}}})
+        return self
+
+    def with_tier_configuration_connection_hub(self, hub_id: str, hub_name: Optional[str] = None) -> Builder:
+        self._request = merge(self._request, {'configuration': {'connection': {'hub': {
+            'id': hub_id,
+            'name': hub_name,
+        }}}})
         return self
 
     def with_tier_configuration_account(self, account_id: str = 'random') -> Builder:
@@ -370,6 +490,11 @@ class Builder:
 
     def with_tier_configuration_tier_level(self, level: int) -> Builder:
         self._request = merge(self._request, {'configuration': {'tier_level': level}})
+        return self
+
+    def with_tier_configuration_params(self, params: List[dict]) -> Builder:
+        for param in params:
+            self.with_tier_configuration_param(**param)
         return self
 
     def with_tier_configuration_param(

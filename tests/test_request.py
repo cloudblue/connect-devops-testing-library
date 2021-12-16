@@ -7,6 +7,8 @@ import os
 TPL_REQUEST_ASSET = '/request_asset.json'
 TPL_REQUEST_TIER_CONFIG = '/request_tier_config.json'
 
+CFG_VALUE_ERROR = 'Some value error on configuration'
+
 
 def test_request_builder_should_fail_building_request_with_wrong_template_type():
     with pytest.raises(ValueError):
@@ -36,27 +38,49 @@ def test_request_builder_should_raise_exception_on_adding_parameter_to_missing_a
 
 
 def test_request_builder_should_build_successfully_a_valid_asset_request():
-    request = (Builder()
-               .with_type('purchase')
-               .with_status('approved')
-               .with_id('PR-0000-0000-0000-100')
-               .with_asset_external_id('123456789')
-               .with_asset_external_uid('9fb50525-a4a4-41a7-ace0-dc3c73796d32')
-               .with_asset_product('PRD-000-000-100', 'disabled')
-               .with_asset_id('AS-0000-0000-1000')
-               .with_asset_status('active')
-               .with_asset_marketplace('MP-12345')
-               .with_asset_connection('CT-0000-0000-0000', 'test')
-               .with_asset_param('PARAM_ID_001', 'VALUE_001')
-               .with_asset_param('PARAM_ID_002', 'VALUE_002')
-               .with_asset_param('PARAM_ID_003', '', 'Some value error on asset')
-               .with_asset_param('PARAM_ID_001', 'VALUE_001_UPDATED')
-               .with_asset_item('ITEM_ID_001', 'ITEM_MPN_001')
-               .with_asset_item('ITEM_ID_001', 'ITEM_MPN_001_UPDATED')
-               .with_asset_item_param('ITEM_ID_001', 'SOME_ITEM_PARAM_ID', 'ITEM_ID_001_PARAM_VALUE')
-               .with_asset_item_param('ITEM_ID_001', 'SOME_ITEM_PARAM_ID', 'ITEM_ID_001_PARAM_VALUE_UPDATED')
-               .with_asset_configuration_param('AS_CFG_ID_001', 'Cfg value', 'Cfg error value')
-               .with_asset_configuration_param('AS_CFG_ID_001', 'Cfg value updated', 'Cfg error value updated'))
+    request = Builder()
+    request.with_type('purchase')
+    request.with_status('approved')
+    request.with_id('PR-0000-0000-0000-100')
+    request.with_asset_external_id('123456789')
+    request.with_asset_external_uid('9fb50525-a4a4-41a7-ace0-dc3c73796d32')
+    request.with_asset_product('PRD-000-000-100', 'disabled')
+    request.with_asset_id('AS-0000-0000-1000')
+    request.with_asset_status('active')
+    request.with_asset_marketplace('MP-12345')
+    request.with_asset_connection(
+        connection_id='CT-0000-0000-0000',
+        connection_type='test',
+        provider={"id": "PA-800-926", "name": "IMC Gamma Team Provider"},
+        vendor={"id": "VA-610-138", "name": "IMC Gamma Team Vendor"},
+        hub={"id": "HB-0000-0000", "name": "None"},
+    )
+    request.with_asset_params([
+        {'param_id': 'PARAM_ID_001', 'value': 'VALUE_001'},
+        {'param_id': 'PARAM_ID_002', 'value': 'VALUE_002'},
+        {'param_id': 'PARAM_ID_003', 'value': '', 'value_error': 'Some value error on asset', },
+        {'param_id': 'PARAM_ID_001', 'value': 'VALUE_001_UPDATED'},
+    ])
+    request.with_asset_items([
+        {
+            'item_id': 'ITEM_ID_001',
+            'item_mpn': 'ITEM_MPN_001',
+            'params': [{'param_id': 'SOME_ITEM_PARAM_ID', 'value': 'ITEM_ID_001_PARAM_VALUE'}]
+        },
+        {
+            'item_id': 'ITEM_ID_001',
+            'item_mpn': 'ITEM_MPN_001_UPDATED',
+        },
+        {
+            'item_id': 'ITEM_ID_001',
+            'item_mpn': 'ITEM_MPN_001_UPDATED',
+            'params': [{'param_id': 'SOME_ITEM_PARAM_ID', 'value': 'ITEM_ID_001_PARAM_VALUE_UPDATED'}]
+        }
+    ])
+    request.with_asset_configuration_params([
+        {'param_id': 'AS_CFG_ID_001', 'value': 'Cfg value', 'value_error': 'Cfg error value'},
+        {'param_id': 'AS_CFG_ID_001', 'value': 'Cfg value updated', 'value_error': 'Cfg error value updated'},
+    ])
 
     assert request.is_asset_request()
 
@@ -77,6 +101,12 @@ def test_request_builder_should_build_successfully_a_valid_asset_request():
 
     assert request['asset']['connection']['id'] == 'CT-0000-0000-0000'
     assert request['asset']['connection']['type'] == 'test'
+    assert request['asset']['connection']['provider']['id'] == 'PA-800-926'
+    assert request['asset']['connection']['provider']['name'] == 'IMC Gamma Team Provider'
+    assert request['asset']['connection']['vendor']['id'] == 'VA-610-138'
+    assert request['asset']['connection']['vendor']['name'] == 'IMC Gamma Team Vendor'
+    assert request['asset']['connection']['hub']['id'] == 'HB-0000-0000'
+    assert request['asset']['connection']['hub']['name'] == 'None'
 
     assert request['asset']['product']['id'] == 'PRD-000-000-100'
     assert request['asset']['product']['status'] == 'disabled'
@@ -103,23 +133,34 @@ def test_request_builder_should_build_successfully_a_valid_asset_request():
 
 
 def test_request_builder_should_build_successfully_a_valid_tier_config_request():
-    request = (Builder()
-               .with_type('setup')
-               .with_status('approved')
-               .with_id('TCR-000-000-000-100')
-               .with_tier_configuration_id('TC-000-000-000')
-               .with_tier_configuration_status('active')
-               .with_tier_configuration_marketplace('MP-12345')
-               .with_tier_configuration_connection('CT-0000-0000-0000', 'test')
-               .with_tier_configuration_configuration_param('P_CFG_CFG_ID', 'CFG_VALUE')
-               .with_tier_configuration_configuration_param('P_CFG_CFG_ID', 'CFG_VALUE_UPDATED')
-               .with_tier_configuration_product('PRD-000-000-100', 'disabled')
-               .with_tier_configuration_account('TA-0000-0000-1000')
-               .with_tier_configuration_tier_level(2)
-               .with_tier_configuration_param('PARAM_ID_001', 'VALUE_001')
-               .with_tier_configuration_param('PARAM_ID_002', 'VALUE_002')
-               .with_tier_configuration_param('PARAM_ID_003', '', 'Some value error on configuration')
-               .with_tier_configuration_param('PARAM_ID_001', 'VALUE_001_UPDATED'))
+    request = Builder()
+    request.with_type('setup')
+    request.with_status('approved')
+    request.with_id('TCR-000-000-000-100')
+    request.with_tier_configuration_id('TC-000-000-000')
+    request.with_tier_configuration_status('active')
+    request.with_tier_configuration_marketplace('MP-12345')
+    request.with_tier_configuration_connection(
+        connection_id='CT-0000-0000-0000',
+        connection_type='test',
+        provider={"id": "PA-800-926", "name": "IMC Gamma Team Provider"},
+        vendor={"id": "VA-610-138", "name": "IMC Gamma Team Vendor"},
+        hub={"id": "HB-0000-0000", "name": "None"},
+    )
+    request.with_tier_configuration_configuration_param('P_CFG_CFG_ID', 'CFG_VALUE')
+    request.with_tier_configuration_configuration_param('P_CFG_CFG_ID', 'CFG_VALUE_UPDATED')
+    request.with_tier_configuration_product('PRD-000-000-100', 'disabled')
+    request.with_tier_configuration_account('TA-0000-0000-1000')
+    request.with_tier_configuration_tier_level(2)
+    request.with_tier_configuration_params([
+        {'param_id': 'PARAM_ID_001', 'value': 'VALUE_001'},
+        {'param_id': 'PARAM_ID_002', 'value': 'VALUE_002'},
+        {'param_id': 'PARAM_ID_003', 'value': '', 'value_error': CFG_VALUE_ERROR},
+        {'param_id': 'PARAM_ID_001', 'value': 'VALUE_001_UPDATED'},
+    ])
+    request.with_params([
+        {'param_id': 'PARAM_ID_001', 'value': 'VALUE_001_UPDATED'},
+    ])
 
     assert request.is_tier_config_request()
 
@@ -137,6 +178,12 @@ def test_request_builder_should_build_successfully_a_valid_tier_config_request()
 
     assert request['configuration']['connection']['id'] == 'CT-0000-0000-0000'
     assert request['configuration']['connection']['type'] == 'test'
+    assert request['configuration']['connection']['provider']['id'] == 'PA-800-926'
+    assert request['configuration']['connection']['provider']['name'] == 'IMC Gamma Team Provider'
+    assert request['configuration']['connection']['vendor']['id'] == 'VA-610-138'
+    assert request['configuration']['connection']['vendor']['name'] == 'IMC Gamma Team Vendor'
+    assert request['configuration']['connection']['hub']['id'] == 'HB-0000-0000'
+    assert request['configuration']['connection']['hub']['name'] == 'None'
 
     assert request['configuration']['configuration']['params'][0]['id'] == 'P_CFG_CFG_ID'
     assert request['configuration']['configuration']['params'][0]['value'] == 'CFG_VALUE_UPDATED'
@@ -148,6 +195,8 @@ def test_request_builder_should_build_successfully_a_valid_tier_config_request()
 
     assert request['configuration']['tier_level'] == 2
 
+    assert len(request['configuration']['params']) == 3
+
     assert request['configuration']['params'][0]['id'] == 'PARAM_ID_001'
     assert request['configuration']['params'][0]['value'] == 'VALUE_001_UPDATED'
 
@@ -156,7 +205,9 @@ def test_request_builder_should_build_successfully_a_valid_tier_config_request()
 
     assert request['configuration']['params'][2]['id'] == 'PARAM_ID_003'
     assert request['configuration']['params'][2]['value'] == ''
-    assert request['configuration']['params'][2]['value_error'] == 'Some value error on configuration'
+    assert request['configuration']['params'][2]['value_error'] == CFG_VALUE_ERROR
+
+    assert len(request['params']) == 3
 
     assert request['params'][0]['id'] == 'PARAM_ID_001'
     assert request['params'][0]['value'] == 'VALUE_001_UPDATED'
@@ -166,7 +217,7 @@ def test_request_builder_should_build_successfully_a_valid_tier_config_request()
 
     assert request['params'][2]['id'] == 'PARAM_ID_003'
     assert request['params'][2]['value'] == ''
-    assert request['params'][2]['value_error'] == 'Some value error on configuration'
+    assert request['params'][2]['value_error'] == CFG_VALUE_ERROR
 
 
 def test_request_builder_should_build_successfully_a_valid_tier_config_request_with_random_account_data():
