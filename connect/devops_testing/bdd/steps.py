@@ -57,9 +57,9 @@ def _with_parameter_without_value(context: Context, parameter: str):
 
 def _with_item(context: Context, item_id: str, item_mpn: str, quantity: str):
     context.builder.with_asset_item(
-        item_id=item_id,
-        item_mpn=item_mpn,
-        quantity=quantity,
+        item_id=context.shared(item_id),
+        item_mpn=context.shared(item_mpn),
+        quantity=context.shared(quantity),
     )
 
 
@@ -121,6 +121,16 @@ def with_note(context: Context, note: str):
 @step('request with configuration account "{account_id}"')
 def with_tier_config_account(context: Context, account_id: str):
     context.builder.with_tier_configuration_account(context.shared(account_id))
+
+
+@step('request with tier config id "{tier_config_id}"')
+def with_tier_config_id(context: Context, tier_config_id: str):
+    context.builder.with_tier_configuration_id(context.shared(tier_config_id))
+
+
+@step('request with asset id "{asset_id}"')
+def with_asset_id(context: Context, asset_id: str):
+    context.builder.with_asset_id(context.shared(asset_id))
 
 
 @step('request with asset external id "{external_id}"')
