@@ -98,6 +98,11 @@ def with_id(context: Context, request_id: str):
     context.builder.with_id(context.shared(request_id))
 
 
+@step('request with type "{request_type}"')
+def with_type(context: Context, request_type: str):
+    context.builder.with_type(context.shared(request_type))
+
+
 @step('request with status "{request_status}"')
 def with_status(context: Context, request_status: str):
     context.builder.with_status(request_status)
