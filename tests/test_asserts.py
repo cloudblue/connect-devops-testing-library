@@ -1,6 +1,7 @@
 from connect.devops_testing import asserts
 
 asset_request = {
+    'id': 'PR-0000-0000-0000-000',
     'status': 'approved',
     'type': 'purchase',
     'reason': 'some reason',
@@ -16,6 +17,7 @@ asset_request = {
     }
 }
 config_request = {
+    'id': 'TCR-0000-0000-0000-000',
     'status': 'pending',
     'type': 'setup',
     'configuration': {
@@ -26,8 +28,58 @@ config_request = {
             {'id': 'ID_3', 'type': 'checkbox', 'value': '', 'structured_value': {'a': False, 'b': True, 'c': True},
              'value_error': ''},
         ],
-    }
+    },
+    'params': [
+        {'id': 'ID', 'type': 'text', 'value': 'value', 'value_error': 'some error'},
+        {'id': 'ID_2', 'type': 'text', 'value': '42', 'value_error': ''},
+        {'id': 'ID_3', 'type': 'checkbox', 'value': '', 'structured_value': {'a': False, 'b': True, 'c': True},
+         'value_error': ''},
+    ],
 }
+
+
+def test_assert_should_assert_request_id():
+    asserts.request_id(asset_request, 'PR-0000-0000-0000-000')
+    asserts.request_id(config_request, 'TCR-0000-0000-0000-000')
+
+
+def test_assert_should_assert_request_type():
+    asserts.request_type(asset_request, 'purchase')
+    asserts.request_type(config_request, 'setup')
+
+
+def test_assert_should_assert_request_param_value_equal():
+    asserts.request_param_value_equal(config_request, 'ID', 'value')
+    asserts.request_param_value_equal(config_request, 'ID_3', 'b|c')
+
+
+def test_assert_should_assert_request_param_value_not_equal():
+    asserts.request_param_value_not_equal(config_request, 'ID', 'other')
+
+
+def test_assert_should_assert_request_param_value_contains():
+    asserts.request_param_value_contains(config_request, 'ID', 'value')
+
+
+def test_assert_should_assert_request_params_value_match():
+    asserts.request_param_value_match(config_request, 'ID', '^value$')
+
+
+def test_assert_should_assert_request_param_value_error_equal():
+    asserts.request_param_value_error_equal(config_request, 'ID', 'some error')
+
+
+def test_assert_should_assert_request_param_value_error_not_equal():
+    asserts.request_param_value_error_not_equal(config_request, 'ID', 'other error')
+
+
+def test_assert_should_assert_request_param_value_error_contains():
+    asserts.request_param_value_error_contains(config_request, 'ID', 'some error')
+    asserts.request_param_value_error_contains(config_request, 'ID', 'some')
+
+
+def test_assert_should_assert_request_param_value_error_match():
+    asserts.request_param_value_error_match(config_request, 'ID', r'^s[\s\w]*r$')
 
 
 def test_should_assert_request_status():
