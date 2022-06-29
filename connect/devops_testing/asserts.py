@@ -180,11 +180,7 @@ def tier_configuration_param_value(
         msg: Optional[str] = None,
 ):
     fn = __operators.get(operator)
-    param = find_by_id(
-        request.get('params', request.get('configuration', {}).get('params', [])),
-        param_id,
-        {},
-    )
+    param = find_by_id(request.get('configuration', {}).get('params', []), param_id, {})
     value, expected = _prepare_assert_argument(param, expected)
     assert fn(value, expected), ASSERT_FAIL if msg is None else msg.format(
         param_id=param_id,
@@ -217,11 +213,7 @@ def tier_configuration_param_value_error(
         msg: Optional[str] = None,
 ):
     fn = __operators.get(operator)
-    param = find_by_id(
-        request.get('params', request.get('configuration', {}).get('params', [])),
-        param_id,
-        {},
-    )
+    param = find_by_id(request.get('configuration', {}).get('params', []), param_id, {})
     value = param.get('value_error', '')
     assert fn(value, expected), ASSERT_FAIL if msg is None else msg.format(
         param_id=param_id,
