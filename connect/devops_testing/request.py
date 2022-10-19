@@ -60,13 +60,17 @@ _tier_config_template = {
 
 def _param_members(
         param: dict,
-        value: Optional[Union[str, dict]] = None,
+        value: Optional[Union[str, dict, list]] = None,
         value_error: Optional[str] = None,
 ) -> dict:
     if isinstance(value, dict):
         key = 'structured_value'
         new_value = param.get(key, {})
         new_value.update(value)
+    elif isinstance(value, list):
+        key = 'structured_value'
+        new_value = param.get(key, [])
+        new_value.extend(value)
     else:
         key = 'value'
         new_value = value
@@ -167,7 +171,7 @@ class Builder:
     def with_param(
             self,
             param_id: str,
-            value: Optional[Union[str, dict]] = None,
+            value: Optional[Union[str, dict, list]] = None,
             value_error: Optional[str] = None,
             value_type: str = 'text',
     ) -> Builder:
@@ -293,7 +297,7 @@ class Builder:
     def with_asset_param(
             self,
             param_id: str,
-            value: Optional[Union[str, dict]] = None,
+            value: Optional[Union[str, dict, list]] = None,
             value_error: Optional[str] = None,
             value_type: str = 'text',
     ) -> Builder:
@@ -392,7 +396,7 @@ class Builder:
     def with_asset_configuration_param(
             self,
             param_id: str,
-            value: Optional[Union[str, dict]] = None,
+            value: Optional[Union[str, dict, list]] = None,
             value_error: Optional[str] = None,
             value_type: str = 'text',
     ) -> Builder:
@@ -500,7 +504,7 @@ class Builder:
     def with_tier_configuration_param(
             self,
             param_id: str,
-            value: Optional[Union[str, dict]] = None,
+            value: Optional[Union[str, dict, list]] = None,
             value_error: Optional[str] = None,
             value_type: str = 'text',
     ) -> Builder:
@@ -523,7 +527,7 @@ class Builder:
     def with_tier_configuration_configuration_param(
             self,
             param_id: str,
-            value: Optional[Union[str, dict]] = None,
+            value: Optional[Union[str, dict, list]] = None,
             value_error: Optional[str] = None,
             value_type: str = 'text',
     ) -> Builder:

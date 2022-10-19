@@ -80,6 +80,8 @@ def test_request_builder_should_build_successfully_a_valid_asset_request():
     request.with_asset_configuration_params([
         {'param_id': 'AS_CFG_ID_001', 'value': 'Cfg value', 'value_error': 'Cfg error value'},
         {'param_id': 'AS_CFG_ID_001', 'value': 'Cfg value updated', 'value_error': 'Cfg error value updated'},
+        {'param_id': 'IS_A_LIST_001', 'value': [1, 2]},
+        {'param_id': 'IS_A_LIST_001', 'value': [3, 4]},
     ])
 
     assert request.is_asset_request()
@@ -130,6 +132,9 @@ def test_request_builder_should_build_successfully_a_valid_asset_request():
     assert request['asset']['configuration']['params'][0]['id'] == 'AS_CFG_ID_001'
     assert request['asset']['configuration']['params'][0]['value'] == 'Cfg value updated'
     assert request['asset']['configuration']['params'][0]['value_error'] == 'Cfg error value updated'
+
+    assert request['asset']['configuration']['params'][1]['id'] == 'IS_A_LIST_001'
+    assert request['asset']['configuration']['params'][1]['structured_value'] == [1, 2, 3, 4]
 
 
 def test_request_builder_should_build_successfully_a_valid_tier_config_request():
