@@ -24,9 +24,10 @@ classifiers = [
 
 [tool.poetry.dependencies]
 python = "^3.8"
-behave = "^1.2.*"
+behave = "^1.2"
 connect-openapi-client = "*"
 Faker = "^9.8.2"
+Pygments = "^2.13.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.1.2"
