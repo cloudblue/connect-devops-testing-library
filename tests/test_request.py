@@ -42,12 +42,13 @@ def test_request_builder_should_build_successfully_a_valid_asset_request():
     request.with_type('purchase')
     request.with_status('approved')
     request.with_id('PR-0000-0000-0000-100')
+    request.with_contract('CNT-000-000', 'distribution', 'Contract')
     request.with_asset_external_id('123456789')
     request.with_asset_external_uid('9fb50525-a4a4-41a7-ace0-dc3c73796d32')
-    request.with_asset_product('PRD-000-000-100', 'disabled')
+    request.with_asset_product('PRD-000-000-100', 'Product', 'disabled')
     request.with_asset_id('AS-0000-0000-1000')
     request.with_asset_status('active')
-    request.with_asset_marketplace('MP-12345')
+    request.with_asset_marketplace('MP-12345', 'Marketplace')
     request.with_asset_connection(
         connection_id='CT-0000-0000-0000',
         connection_type='test',
@@ -91,7 +92,13 @@ def test_request_builder_should_build_successfully_a_valid_asset_request():
     assert request['id'] == 'PR-0000-0000-0000-100'
     assert request['type'] == 'purchase'
     assert request['status'] == 'approved'
+
     assert request['marketplace']['id'] == 'MP-12345'
+    assert request['marketplace']['name'] == 'Marketplace'
+
+    assert request['contract']['id'] == 'CNT-000-000'
+    assert request['contract']['type'] == 'distribution'
+    assert request['contract']['name'] == 'Contract'
 
     assert request['asset']['id'] == 'AS-0000-0000-1000'
     assert request['asset']['status'] == 'active'
@@ -100,6 +107,7 @@ def test_request_builder_should_build_successfully_a_valid_asset_request():
     assert request['asset']['external_uid'] == '9fb50525-a4a4-41a7-ace0-dc3c73796d32'
 
     assert request['asset']['marketplace']['id'] == 'MP-12345'
+    assert request['asset']['marketplace']['name'] == 'Marketplace'
 
     assert request['asset']['connection']['id'] == 'CT-0000-0000-0000'
     assert request['asset']['connection']['type'] == 'test'
@@ -111,6 +119,7 @@ def test_request_builder_should_build_successfully_a_valid_asset_request():
     assert request['asset']['connection']['hub']['name'] == 'None'
 
     assert request['asset']['product']['id'] == 'PRD-000-000-100'
+    assert request['asset']['product']['name'] == 'Product'
     assert request['asset']['product']['status'] == 'disabled'
 
     assert request['asset']['params'][0]['id'] == 'PARAM_ID_001'
@@ -144,7 +153,7 @@ def test_request_builder_should_build_successfully_a_valid_tier_config_request()
     request.with_id('TCR-000-000-000-100')
     request.with_tier_configuration_id('TC-000-000-000')
     request.with_tier_configuration_status('active')
-    request.with_tier_configuration_marketplace('MP-12345')
+    request.with_tier_configuration_marketplace('MP-12345', 'Marketplace')
     request.with_tier_configuration_connection(
         connection_id='CT-0000-0000-0000',
         connection_type='test',
@@ -174,12 +183,15 @@ def test_request_builder_should_build_successfully_a_valid_tier_config_request()
     assert request['id'] == 'TCR-000-000-000-100'
     assert request['type'] == 'setup'
     assert request['status'] == 'approved'
+
     assert request['marketplace']['id'] == 'MP-12345'
+    assert request['marketplace']['name'] == 'Marketplace'
 
     assert request['configuration']['id'] == 'TC-000-000-000'
     assert request['configuration']['status'] == 'active'
 
     assert request['configuration']['marketplace']['id'] == 'MP-12345'
+    assert request['configuration']['marketplace']['name'] == 'Marketplace'
 
     assert request['configuration']['connection']['id'] == 'CT-0000-0000-0000'
     assert request['configuration']['connection']['type'] == 'test'
