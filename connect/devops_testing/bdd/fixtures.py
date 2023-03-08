@@ -2,7 +2,6 @@ from typing import Any, Callable, Optional
 
 from behave import fixture
 from behave.runner import Context
-
 from connect.client import ConnectClient
 from connect.devops_testing.fixtures import make_request_builder, make_request_dispatcher
 
