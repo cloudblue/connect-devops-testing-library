@@ -1,16 +1,14 @@
 from __future__ import annotations
 
+import json
+import time
 from abc import abstractmethod
 from copy import deepcopy
 from typing import List, Optional, Union
 
 from connect.client import ConnectClient
 from connect.devops_testing.utils import find_by_id, merge, request_model, request_parameters
-
 from faker import Faker
-
-import json
-import time
 
 _asset_template = {
     "type": "purchase",

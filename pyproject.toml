@@ -18,14 +18,19 @@ keywords = [
     'framework'
 ]
 classifiers = [
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
     "Topic :: Software Development :: Build Tools",
     "Topic :: Software Development :: Libraries :: Python Modules"
 ]
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = ">=3.7,<4"
 behave = "^1.2"
-connect-openapi-client = "*"
+connect-openapi-client = "^25.0"
 Faker = "^9.8.2"
 Pygments = "^2.13.0"
 
@@ -33,22 +38,21 @@ Pygments = "^2.13.0"
 pytest = "^6.1.2"
 pytest-cov = "^2.10.1"
 pytest-mock = "^3.3.1"
-pytest-asyncio = "^0.15.1"
-pytest-httpx = "^0.12.0"
 python-dotenv = "^0.19.2"
 coverage = { extras = ["toml"], version = "^5.3" }
 responses = "^0.12.0"
-flake8 = "~3.8"
-flake8-bugbear = "~20"
+flake8 = "^5.0"
+flake8-bugbear = "^22"
 flake8-cognitive-complexity = "^0.1"
-flake8-commas = "~2.0"
+flake8-commas = "^2.1"
 flake8-future-import = "~0.4"
 flake8-import-order = "~0.18"
-flake8-broken-line = "~0.3"
-flake8-comprehensions = "^3.3.1"
+flake8-broken-line = "~0.5"
+flake8-comprehensions = "^3.10"
 flake8-debugger = "^4.0.0"
-flake8-eradicate = "^1.0.0"
+flake8-eradicate = "^1.3.0"
 flake8-string-format = "^0.3.0"
+flake8-pyproject = "^1.2.2"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
@@ -75,3 +79,24 @@ exclude_lines = [
 
 [tool.coverage.html]
 skip_covered = true
+
+[tool.flake8]
+exclude = [
+    '.idea',
+    '.vscode',
+    '.git',
+    '*/migrations/*.py',
+    '*.eggs',
+    '*.egg',
+    'tests/',
+    'setup.py',
+    'connect/.data',
+    'samples'
+]
+
+show_source = true
+max_line_length = 120
+import-order-style = 'smarkets'
+max_cognitive_complexity = 15
+ignore = ['FI1', 'I100', 'W503', 'FI58']
+
