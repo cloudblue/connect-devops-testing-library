@@ -443,8 +443,7 @@ class Builder:
         return self
 
     def with_tier_configuration_product(self, product_id: str, product_name: str = None,
-        status: str = 'published'
-    ) -> Builder:
+                                        status: str = 'published') -> Builder:
         product = {
             'id': product_id,
             'status': status,
