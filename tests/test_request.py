@@ -163,7 +163,7 @@ def test_request_builder_should_build_successfully_a_valid_tier_config_request()
     )
     request.with_tier_configuration_configuration_param('P_CFG_CFG_ID', 'CFG_VALUE')
     request.with_tier_configuration_configuration_param('P_CFG_CFG_ID', 'CFG_VALUE_UPDATED')
-    request.with_tier_configuration_product('PRD-000-000-100', 'disabled')
+    request.with_tier_configuration_product('PRD-000-000-100', 'Product', 'disabled')
     request.with_tier_configuration_account('TA-0000-0000-1000')
     request.with_tier_configuration_tier_level(2)
     request.with_tier_configuration_params([
