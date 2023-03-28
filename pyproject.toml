@@ -31,7 +31,7 @@ classifiers = [
 python = ">=3.7,<4"
 behave = "^1.2"
 connect-openapi-client = "^25.0"
-Faker = "^9.8.2"
+Faker = "^15.3.4"
 Pygments = "^2.13.0"
 
 [tool.poetry.dev-dependencies]
@@ -99,4 +99,3 @@ max_line_length = 120
 import-order-style = 'smarkets'
 max_cognitive_complexity = 15
 ignore = ['FI1', 'I100', 'W503', 'FI58']
-
