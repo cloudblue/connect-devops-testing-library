@@ -197,7 +197,7 @@ class Builder:
         self._request = merge(self._request, {'contract': {
             'id': contract_id,
             'type': contract_type,
-            'name': contract_name
+            'name': contract_name,
         }})
         return self
 
@@ -224,14 +224,14 @@ class Builder:
             'product': {
                 'id': product_id,
                 'name': product_name,
-                'status': status
-            }
+                'status': status,
+            },
         }})
         return self
 
     def with_asset_marketplace(self, marketplace_id: str, marketplace_name: str) -> Builder:
         self._request = merge(self._request, {'asset': {
-            'marketplace': {'id': marketplace_id, 'name': marketplace_name}}
+            'marketplace': {'id': marketplace_id, 'name': marketplace_name}},
         })
         return self.with_marketplace(marketplace_id, marketplace_name)
 
@@ -444,7 +444,7 @@ class Builder:
 
     def with_tier_configuration_marketplace(self, marketplace_id: str, marketplace_name: str) -> Builder:
         self._request = merge(self._request, {'configuration': {
-            'marketplace': {'id': marketplace_id, 'name': marketplace_name}}
+            'marketplace': {'id': marketplace_id, 'name': marketplace_name}},
         })
         return self.with_marketplace(marketplace_id, marketplace_name)
 
