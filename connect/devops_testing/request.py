@@ -189,8 +189,19 @@ class Builder:
         param.update({k: v for k, v in members.items() if v is not None})
         return self
 
-    def with_marketplace(self, marketplace_id: str) -> Builder:
-        self._request = merge(self._request, {'marketplace': {'id': marketplace_id}})
+    def with_marketplace(self, marketplace_id: str, marketplace_name: str = None) -> Builder:
+        marketplace = {'id': marketplace_id}
+        if marketplace_name:
+            marketplace.update({'name': marketplace_name})
+        self._request = merge(self._request, {'marketplace': marketplace})
+        return self
+
+    def with_contract(self, contract_id: str, contract_type: str, contract_name: str = '') -> Builder:
+        self._request = merge(self._request, {'contract': {
+            'id': contract_id,
+            'type': contract_type,
+            'name': contract_name,
+        }})
         return self
 
     def with_asset_id(self, asset_id: str) -> Builder:
@@ -211,13 +222,22 @@ class Builder:
         self._request = merge(self._request, {'asset': {'status': asset_status}})
         return self
 
-    def with_asset_product(self, product_id: str, status: str = 'published') -> Builder:
-        self._request = merge(self._request, {'asset': {'product': {'id': product_id, 'status': status}}})
+    def with_asset_product(self, product_id: str, product_name: str = None, status: str = 'published') -> Builder:
+        product = {
+            'id': product_id,
+            'status': status,
+        }
+        if product_name:
+            product.update({'name': product_name})
+        self._request = merge(self._request, {'asset': {'product': product}})
         return self
 
-    def with_asset_marketplace(self, marketplace_id: str) -> Builder:
-        self._request = merge(self._request, {'asset': {'marketplace': {'id': marketplace_id}}})
-        return self.with_marketplace(marketplace_id)
+    def with_asset_marketplace(self, marketplace_id: str, marketplace_name: str = None) -> Builder:
+        marketplace = {'id': marketplace_id}
+        if marketplace_name:
+            marketplace.update({'name': marketplace_name})
+        self._request = merge(self._request, {'asset': {'marketplace': marketplace}})
+        return self.with_marketplace(marketplace_id, marketplace_name)
 
     def with_asset_connection(
             self,
@@ -422,13 +442,23 @@ class Builder:
         self._request = merge(self._request, {'configuration': {'status': tier_configuration_status}})
         return self
 
-    def with_tier_configuration_product(self, product_id: str, status: str = 'published') -> Builder:
-        self._request = merge(self._request, {'configuration': {'product': {'id': product_id, 'status': status}}})
+    def with_tier_configuration_product(self, product_id: str, product_name: str = None,
+                                        status: str = 'published') -> Builder:
+        product = {
+            'id': product_id,
+            'status': status,
+        }
+        if product_name:
+            product.update({'name': product_name})
+        self._request = merge(self._request, {'configuration': {'product': product}})
         return self
 
-    def with_tier_configuration_marketplace(self, marketplace_id: str) -> Builder:
-        self._request = merge(self._request, {'configuration': {'marketplace': {'id': marketplace_id}}})
-        return self.with_marketplace(marketplace_id)
+    def with_tier_configuration_marketplace(self, marketplace_id: str, marketplace_name: str = None) -> Builder:
+        marketplace = {'id': marketplace_id}
+        if marketplace_name:
+            marketplace.update({'name': marketplace_name})
+        self._request = merge(self._request, {'configuration': {'marketplace': marketplace}})
+        return self.with_marketplace(marketplace_id, marketplace_name)
 
     def with_tier_configuration_connection(
             self,
