@@ -1,4 +1,4 @@
-name: Connect DevOps Testing Library Tests
+name: Tests
 
 on:
   push:
