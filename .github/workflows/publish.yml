@@ -1,4 +1,4 @@
-name: Connect DevOps Testing Library Tests
+name: Publish Library
 
 on:
   push:
@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [ 3.8 ]
+        python-version: [ '3.8' ]
     steps:
       - name: Checkout
         uses: actions/checkout@v2
