@@ -271,7 +271,7 @@ def with_items(context: Context):
 def parameter_value_is(context: Context, parameter: str, value: str):
     handler = _get_request_handler(
         asset=asserts.asset_param_value_equal,
-        tier_config=asserts.tier_configuration_param_value_equal,
+        tier_config=asserts.request_param_value_equal,
         request_type=request_model(context.request),
     )
 
@@ -286,7 +286,7 @@ def parameter_value_is(context: Context, parameter: str, value: str):
 def parameter_value_contains(context: Context, parameter: str, value: str):
     handler = _get_request_handler(
         asset=asserts.asset_param_value_contains,
-        tier_config=asserts.tier_configuration_param_value_contains,
+        tier_config=asserts.request_param_value_contains,
         request_type=request_model(context.request),
     )
 
@@ -301,7 +301,7 @@ def parameter_value_contains(context: Context, parameter: str, value: str):
 def parameter_value_match(context: Context, parameter: str, pattern: str):
     handler = _get_request_handler(
         asset=asserts.asset_param_value_match,
-        tier_config=asserts.tier_configuration_param_value_match,
+        tier_config=asserts.request_param_value_match,
         request_type=request_model(context.request),
     )
 
@@ -316,7 +316,7 @@ def parameter_value_match(context: Context, parameter: str, pattern: str):
 def parameter_value_error_is(context: Context, parameter: str, value_error: str):
     handler = _get_request_handler(
         asset=asserts.asset_param_value_error_equal,
-        tier_config=asserts.tier_configuration_param_value_error_equal,
+        tier_config=asserts.request_param_value_error_equal,
         request_type=request_model(context.request),
     )
 
@@ -331,7 +331,7 @@ def parameter_value_error_is(context: Context, parameter: str, value_error: str)
 def parameter_value_error_contains(context: Context, parameter: str, value_error: str):
     handler = _get_request_handler(
         asset=asserts.asset_param_value_error_contains,
-        tier_config=asserts.tier_configuration_param_value_error_contains,
+        tier_config=asserts.request_param_value_error_contains,
         request_type=request_model(context.request),
     )
 
@@ -346,7 +346,7 @@ def parameter_value_error_contains(context: Context, parameter: str, value_error
 def parameter_value_error_match(context: Context, parameter: str, pattern: str):
     handler = _get_request_handler(
         asset=asserts.asset_param_value_error_match,
-        tier_config=asserts.tier_configuration_param_value_error_match,
+        tier_config=asserts.request_param_value_error_match,
         request_type=request_model(context.request),
     )
 
