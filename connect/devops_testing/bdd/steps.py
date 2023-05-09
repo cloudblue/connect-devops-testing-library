@@ -31,6 +31,20 @@ def _request_is_process(context: Context):
     print(f"Processed request id: {context.request.get('id')}")
 
 
+def _request_schedule(context: Context):
+    context.request.update(context.connect.schedule_request(
+        request=context.request,
+    ))
+    print(f"Processed request id: {context.request.get('id')} [{context.request.get('status')}]")
+
+
+def _request_revoke(context: Context):
+    context.request.update(context.connect.revoke_request(
+        request=context.request,
+    ))
+    print(f"Processed request id: {context.request.get('id')} [{context.request.get('status')}]")
+
+
 def _with_checkbox_parameter(context: Context, parameter: str, values: str, checked: bool):
     handler = _get_request_handler(
         asset=context.builder.with_asset_param,
@@ -66,6 +80,16 @@ def _with_item(context: Context, item_id: str, item_mpn: str, quantity: str):
 @step('request is processed')
 def request_is_processed(context: Context):
     _request_is_process(context)
+
+
+@step('subscription request is being scheduled')
+def request_is_being_scheduled(context: Context):
+    _request_schedule(context)
+
+
+@step('subscription request is being revoked')
+def request_is_being_revoked(context: Context):
+    _request_revoke(context)
 
 
 @step('subscription request is processed')

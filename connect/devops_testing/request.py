@@ -4,6 +4,7 @@ import json
 import time
 from abc import abstractmethod
 from copy import deepcopy
+from datetime import datetime, timedelta
 from typing import List, Optional, Union
 
 from connect.client import ConnectClient
@@ -600,13 +601,19 @@ class Dispatcher:
     def _save_request(self, request) -> dict:
         return self._get_request_handler(request).save(request)
 
+    def _schedule_request(self, request) -> dict:
+        return self._get_request_handler(request).schedule(request)
+
+    def _revoke_request(self, request) -> dict:
+        return self._get_request_handler(request).revoke(request)
+
     def _fetch_processed_request(self, request: dict, timeout: int, max_attempt: int) -> dict:
         finder = self._get_request_handler(request)
 
         attempts = 0
         request = finder.find(request.get('id'))
 
-        while request['status'] in ['pending'] and attempts <= max_attempt:
+        while request['status'] in ['pending', 'revoking'] and attempts <= max_attempt:
             attempts += 1
             time.sleep(timeout)
             request = finder.find(request.get('id'))
@@ -630,6 +637,48 @@ class Dispatcher:
         """
         return self._fetch_processed_request(
             request=self._save_request(request),
+            timeout=self._timeout if timeout is None else timeout,
+            max_attempt=self._max_attempts if max_attempt is None else max_attempt,
+        )
+
+    def schedule_request(
+            self,
+            request: dict,
+            timeout: Optional[int] = None,
+            max_attempt: Optional[int] = None,
+    ) -> dict:
+        """
+        Schedules the given request into the Connect platform and waits util
+        the request is processed by some processor (can be manually processed)
+
+        :param request: dict The request to be processed.
+        :param timeout: int The amount of time in seconds to wait each pull.
+        :param max_attempt: int The max number of pull attempts.
+        :return: dict The processed request.
+        """
+        return self._fetch_processed_request(
+            request=self._schedule_request(request),
+            timeout=self._timeout if timeout is None else timeout,
+            max_attempt=self._max_attempts if max_attempt is None else max_attempt,
+        )
+
+    def revoke_request(
+            self,
+            request: dict,
+            timeout: Optional[int] = None,
+            max_attempt: Optional[int] = None,
+    ) -> dict:
+        """
+        Revokes the given request into the Connect platform and waits util
+        the request is processed by some processor (can be manually processed)
+
+        :param request: dict The request to be processed.
+        :param timeout: int The amount of time in seconds to wait each pull.
+        :param max_attempt: int The max number of pull attempts.
+        :return: dict The processed request.
+        """
+        return self._fetch_processed_request(
+            request=self._revoke_request(request),
             timeout=self._timeout if timeout is None else timeout,
             max_attempt=self._max_attempts if max_attempt is None else max_attempt,
         )
@@ -658,6 +707,24 @@ class _RequestRepository:
         Save (create/update) the request into the Connect Platform.
 
         :param request: dict The request to create/update.
+        :return: dict The request dictionary
+        """
+
+    @abstractmethod
+    def schedule(self, request: dict) -> dict:  # pragma: no cover
+        """
+        Schedules the request into the Connect Platform.
+
+        :param request: dict The request to schedule.
+        :return: dict The request dictionary
+        """
+
+    @abstractmethod
+    def revoke(self, request: dict) -> dict:  # pragma: no cover
+        """
+        Revokes the request into the Connect Platform.
+
+        :param request: dict The request to revoke.
         :return: dict The request dictionary
         """
 
@@ -693,6 +760,28 @@ class _AssetRequestRepository(_RequestRepository):
 
         return request
 
+    def revoke(self, request: dict) -> dict:
+        shortcut = self._client.requests
+        current = self.find(request.get('id'))
+        if current.get('status') == 'scheduled':
+            shortcut[request.get('id')].action('revoke').post(
+                payload={
+                    'reason': 'Revoked from E2E tests',
+                },
+            )
+        return request
+
+    def schedule(self, request: dict) -> dict:
+        shortcut = self._client.requests
+        req_current = shortcut[request.get('id')].get()
+        if req_current.get('status') == 'pending':
+            shortcut[request.get('id')].action('schedule').post(
+                payload={
+                    'planned_date': (datetime.now() + timedelta(days=10)).isoformat(),
+                },
+            )
+        return request
+
 
 class _TierConfigRequestRepository(_RequestRepository):
     def find(self, request_id: str) -> dict:
@@ -724,3 +813,9 @@ class _TierConfigRequestRepository(_RequestRepository):
                 )
 
         return request
+
+    def schedule(self, request: dict) -> dict:
+        """ not applicable """
+
+    def revoke(self, request: dict) -> dict:
+        """ not applicable """
