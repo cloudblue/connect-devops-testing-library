@@ -3,14 +3,21 @@ import pytest
 from connect.devops_testing.bdd.fixtures import use_connect_request_builder, use_connect_request_dispatcher
 from connect.devops_testing.bdd.steps import (
     tier_config_request, asset_request, with_tier_config_account, with_id, with_product_id,
-    with_marketplace_id, with_reseller_level, with_parameter_with_value, with_parameter_with_value_error,
-    request_status_is, parameter_value_is, parameter_value_error_is, request_is_processed, with_status,
-    subscription_request_is_processed, tier_configuration_request_is_processed, parameter_value_contains,
-    parameter_value_error_contains, parameter_value_match, parameter_value_error_match, with_parameter_checked,
+    with_marketplace_id, with_reseller_level, with_parameter_with_value,
+    with_parameter_with_value_error,
+    request_status_is, parameter_value_is, parameter_value_error_is, request_is_processed,
+    with_status,
+    subscription_request_is_processed, tier_configuration_request_is_processed,
+    parameter_value_contains,
+    parameter_value_error_contains, parameter_value_match, parameter_value_error_match,
+    with_parameter_checked,
     with_parameter_not_checked, with_parameter_without_value, with_parameter_without_value_error,
-    with_asset_tier_customer, with_asset_tier_tier1, with_asset_tier_tier2, with_connection_id, with_item_quantity,
-    with_items, request_note_is, request_reason_is, with_note, with_reason, with_asset_tier_from_country,
+    with_asset_tier_customer, with_asset_tier_tier1, with_asset_tier_tier2, with_connection_id,
+    with_item_quantity,
+    with_items, request_note_is, request_reason_is, with_note, with_reason,
+    with_asset_tier_from_country,
     with_asset_external_id, with_asset_external_uid, with_tier_config_id, with_asset_id, with_type,
+    request_is_being_scheduled, request_is_being_revoked,
 )
 
 PARAM_ID_A = 'PARAM_ID_A'
@@ -200,6 +207,118 @@ def test_step_should_assert_successfully_an_asset_request(behave_context):
     _shared_assert_steps(behave_context)
 
 
+def test_step_should_schedule_an_asset_request(behave_context, response_factory, sync_client_factory):
+    behave_context.request = {'id': 'PR-000-000-000-000'}
+
+    use_connect_request_builder(context=behave_context)
+    asset_request(behave_context)
+    with_status(behave_context, 'pending')
+
+    mocked_client = sync_client_factory([
+        response_factory(
+            value={'id': 'PR-000-000-000-000', 'type': 'purchase', 'status': 'pending'}),
+        response_factory(
+            value={'id': 'PR-000-000-000-000', 'type': 'purchase', 'status': 'someother'}),
+        response_factory(
+            value={'id': 'PR-000-000-000-000', 'type': 'purchase', 'status': 'pending'}),
+        response_factory(
+            value={'id': 'PR-000-000-000-000', 'type': 'purchase', 'status': 'pending'}),
+        response_factory(
+            value={'id': 'PR-000-000-000-000', 'type': 'purchase', 'status': 'scheduled'}),
+    ])
+    use_connect_request_dispatcher(context=behave_context, client=mocked_client)
+
+    request_is_processed(behave_context)
+    request_is_being_scheduled(behave_context)
+
+    assert behave_context.request['id'] == 'PR-000-000-000-000'
+    assert behave_context.request['type'] == 'purchase'
+    assert behave_context.request['status'] == 'scheduled'
+
+
+def test_step_should_not_schedule_an_asset_request(behave_context, response_factory, sync_client_factory):
+    behave_context.request = {'id': 'PR-000-000-000-000'}
+
+    use_connect_request_builder(context=behave_context)
+    asset_request(behave_context)
+    with_status(behave_context, 'pending')
+
+    mocked_client = sync_client_factory([
+        response_factory(
+            value={'id': 'PR-000-000-000-000', 'type': 'purchase', 'status': 'pending'}),
+        response_factory(
+            value={'id': 'PR-000-000-000-000', 'type': 'purchase', 'status': 'approved'}),
+        response_factory(
+            value={'id': 'PR-000-000-000-000', 'type': 'purchase', 'status': 'approved'}),
+        response_factory(
+            value={'id': 'PR-000-000-000-000', 'type': 'purchase', 'status': 'approved'}),
+    ])
+    use_connect_request_dispatcher(context=behave_context, client=mocked_client)
+
+    request_is_processed(behave_context)
+    request_is_being_scheduled(behave_context)
+
+    assert behave_context.request['id'] == 'PR-000-000-000-000'
+    assert behave_context.request['type'] == 'purchase'
+    assert behave_context.request['status'] == 'approved'
+
+
+def test_step_should_revoke_an_asset_request(behave_context, response_factory, sync_client_factory):
+    behave_context.request = {'id': 'PR-000-000-000-000'}
+
+    use_connect_request_builder(context=behave_context)
+    asset_request(behave_context)
+    with_status(behave_context, 'pending')
+
+    mocked_client = sync_client_factory([
+        response_factory(
+            value={'id': 'PR-000-000-000-000', 'type': 'purchase', 'status': 'pending'}),
+        response_factory(
+            value={'id': 'PR-000-000-000-000', 'type': 'purchase', 'status': 'scheduled'}),
+        response_factory(
+            value={'id': 'PR-000-000-000-000', 'type': 'purchase', 'status': 'scheduled'}),
+        response_factory(
+            value={'id': 'PR-000-000-000-000', 'type': 'purchase', 'status': 'revoking'}),
+        response_factory(
+            value={'id': 'PR-000-000-000-000', 'type': 'purchase', 'status': 'revoked'}),
+    ])
+    use_connect_request_dispatcher(context=behave_context, client=mocked_client)
+
+    request_is_processed(behave_context)
+    request_is_being_revoked(behave_context)
+
+    assert behave_context.request['id'] == 'PR-000-000-000-000'
+    assert behave_context.request['type'] == 'purchase'
+    assert behave_context.request['status'] == 'revoked'
+
+
+def test_step_should_not_revoke_an_asset_request(behave_context, response_factory, sync_client_factory):
+    behave_context.request = {'id': 'PR-000-000-000-000'}
+
+    use_connect_request_builder(context=behave_context)
+    asset_request(behave_context)
+    with_status(behave_context, 'pending')
+
+    mocked_client = sync_client_factory([
+        response_factory(
+            value={'id': 'PR-000-000-000-000', 'type': 'purchase', 'status': 'pending'}),
+        response_factory(
+            value={'id': 'PR-000-000-000-000', 'type': 'purchase', 'status': 'approved'}),
+        response_factory(
+            value={'id': 'PR-000-000-000-000', 'type': 'purchase', 'status': 'approved'}),
+        response_factory(
+            value={'id': 'PR-000-000-000-000', 'type': 'purchase', 'status': 'approved'}),
+    ])
+    use_connect_request_dispatcher(context=behave_context, client=mocked_client)
+
+    request_is_processed(behave_context)
+    request_is_being_revoked(behave_context)
+
+    assert behave_context.request['id'] == 'PR-000-000-000-000'
+    assert behave_context.request['type'] == 'purchase'
+    assert behave_context.request['status'] == 'approved'
+
+
 def test_step_should_successfully_process_the_request(sync_client_factory, response_factory, behave_context):
     process_steps = [
         request_is_processed,
@@ -227,3 +346,4 @@ def test_step_should_successfully_process_the_request(sync_client_factory, respo
         assert behave_context.request['id'] == 'PR-000-000-000-000'
         assert behave_context.request['type'] == 'purchase'
         assert behave_context.request['status'] == 'approved'
+
