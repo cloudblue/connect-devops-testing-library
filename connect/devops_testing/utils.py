@@ -1,5 +1,7 @@
 from copy import deepcopy
-from typing import List, Optional
+from typing import List, Optional, Union
+
+from faker import Faker
 
 
 def find_by_id(collection: List, element_id: str, default: Optional[dict] = None) -> Optional[dict]:
@@ -77,3 +79,54 @@ def request_parameters(params: List[dict]) -> List[dict]:
         }
 
     return list(map(_map, params))
+
+
+def make_tier(tier_name: str = 'customer') -> dict:
+    _fake = Faker(['en_US'])
+    tier_type = 'customer' if tier_name == 'customer' else 'reseller'
+
+    return {
+        "name": _fake.company(),
+        "type": tier_type,
+        "external_id": f"{_fake.pyint(1000000, 9999999)}",
+        "external_uid": f"{_fake.uuid4()}",
+        "contact_info": {
+            "address_line1": f"{_fake.pyint(100, 999)}, {_fake.street_name()}",
+            "address_line2": _fake.secondary_address(),
+            "city": _fake.city(),
+            "state": _fake.state(),
+            "postal_code": _fake.zipcode(),
+            "country": _fake.country_code(),
+            "contact": {
+                "first_name": _fake.first_name(),
+                "last_name": _fake.last_name(),
+                "email": _fake.company_email(),
+                "phone_number": {
+                    "country_code": f"+{_fake.pyint(1, 99)}",
+                    "area_code": f"{_fake.pyint(1, 99)}",
+                    "phone_number": f"{_fake.pyint(1, 999999)}",
+                    "extension": f"{_fake.pyint(1, 100)}",
+                },
+            },
+        },
+    }
+
+
+def param_members(
+    param: dict,
+    value: Optional[Union[str, dict, list]] = None,
+    value_error: Optional[str] = None,
+) -> dict:
+    if isinstance(value, dict):
+        key = 'structured_value'
+        new_value = param.get(key, {})
+        new_value.update(value)
+    elif isinstance(value, list):
+        key = 'structured_value'
+        new_value = param.get(key, [])
+        new_value.extend(value)
+    else:
+        key = 'value'
+        new_value = value
+
+    return {key: new_value, 'value_error': value_error}
