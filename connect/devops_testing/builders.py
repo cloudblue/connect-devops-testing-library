@@ -82,37 +82,28 @@ class AssetBuilder:
         return self
 
     def with_item(
-            self,
-            item_id: str,
-            item_mpn: str,
-            quantity: str = '1',
-            old_quantity: Optional[str] = None,
-            item_type: Optional[str] = None,
-            period: Optional[str] = None,
-            unit: Optional[str] = None,
-            display_name: Optional[str] = None,
-            global_id: Optional[str] = None,
-            params: Optional[List[dict]] = None,
+        self,
+        item_id: str,
+        item_mpn: str,
+        quantity: str = '1',
+        old_quantity: Optional[str] = None,
+        item_type: Optional[str] = None,
+        period: Optional[str] = None,
+        unit: Optional[str] = None,
+        display_name: Optional[str] = None,
+        global_id: Optional[str] = None,
+        params: Optional[List[dict]] = None,
     ) -> AssetBuilder:
         item = find_by_id(self._data.get('items', []), item_id)
         if item is None:
-            item = {'id': item_id}
+            item = {}
             self._data = merge(self._data, {'items': [item]})
 
-        members = {
-            'global_id': global_id,
-            'display_name': display_name,
-            'mpn': item_mpn,
-            'quantity': quantity,
-            'old_quantity': old_quantity,
-            'params': [],
-            'item_type': item_type,
-            'period': period,
-            'type': unit,
-        }
-
-        item.update({k: v for k, v in members.items() if v is not None})
-        self.with_item_params(item_id, [] if params is None else params)
+        item.update(self.make_item(
+            item_id, item_mpn, quantity, old_quantity, item_type, period, unit, display_name, global_id))
+        
+        if params is not None:
+            self.with_item_params(item_id, params)
         return self
 
     def with_item_params(self, item_id: str, params: List[dict]) -> AssetBuilder:
@@ -133,20 +124,12 @@ class AssetBuilder:
 
         param = find_by_id(item.get('params', []), param_id)
         if param is None:
-            param = {
-                'id': param_id,
-                'title': f'Parameter {param_id}',
-                'description': f'Description of {param_id}',
-                'type': value_type,
-                'scope': 'item',
-                'phase': 'configuration',
-                'value': '',
-            }
+            param = {}
             item['params'].append(param)
 
-        param.update({'value': value})
+        param.update(self.make_item_param(param_id, value, value_type))
         return self
-    
+
     def with_params(self, params: List[dict]) -> AssetBuilder:
         for param in params:
             self.with_param(**param)
@@ -160,47 +143,31 @@ class AssetBuilder:
         value_type: str = 'text',
     ) -> AssetBuilder:
         param = find_by_id(self._data.get('params', []), param_id)
-
         if param is None:
-            param = {
-                'id': param_id,
-                'name': param_id,
-                'title': f'Asset parameter {param_id}',
-                'description': f'Asset parameter description of {param_id}',
-                'type': value_type,
-            }
+            param = {}
             self._data = merge(self._data, {'params': [param]})
 
-        members = param_members(param, value, value_error)
-        param.update({k: v for k, v in members.items() if v is not None})
+        param.update(self.make_param(param_id, value, value_error, value_type))
         return self
-    
+
     def with_configuration_params(self, params: List[dict]) -> AssetBuilder:
         for param in params:
             self.with_configuration_param(**param)
         return self
 
     def with_configuration_param(
-            self,
-            param_id: str,
-            value: Optional[Union[str, dict, list]] = None,
-            value_error: Optional[str] = None,
-            value_type: str = 'text',
+        self,
+        param_id: str,
+        value: Optional[Union[str, dict, list]] = None,
+        value_error: Optional[str] = None,
+        value_type: str = 'text',
     ) -> AssetBuilder:
         param = find_by_id(self._data.get('configuration', {}).get('params', []), param_id)
-
         if param is None:
-            param = {
-                'id': param_id,
-                'name': param_id,
-                'title': f'Asset configuration parameter {param_id}',
-                'description': f'Asset parameter configuration description of {param_id}',
-                'type': value_type,
-            }
+            param = {}
             self._data = merge(self._data, {'configuration': {'params': [param]}})
 
-        members = param_members(param, value, value_error)
-        param.update({k: v for k, v in members.items() if v is not None})
+        param.update(self.make_param(param_id, value, value_error, value_type))
         return self
     
     def with_tier(self, tier_name: str, tier: Union[str, dict]) -> AssetBuilder:
@@ -315,3 +282,58 @@ class AssetBuilder:
         if isinstance(tier, str):
             tier = make_tier(tier_name) if tier == 'random' else {'id': tier}
         return {'tiers': {tier_name: tier}}
+    
+    @classmethod
+    def make_item(cls,
+        item_id: str,
+        item_mpn: str,
+        quantity: str,
+        old_quantity: str,
+        item_type: str,
+        period: str,
+        unit: str,
+        display_name: str,
+        global_id: str
+    ) -> dict:
+        item = {'id': item_id, 'params': []}
+        
+        members = {
+            'mpn': item_mpn,
+            'quantity': quantity,
+            'old_quantity': old_quantity,
+            'item_type': item_type,
+            'period': period,
+            'type': unit,
+            'display_name': display_name,
+            'global_id': global_id,
+        }
+        item.update({k: v for k, v in members.items() if v is not None})
+        
+        return item
+    
+    @classmethod
+    def make_param(cls, param_id: str, value: Union[str, dict, list], value_error: str, value_type: str) -> dict:
+        param = {
+            'id': param_id,
+            'name': param_id,
+            'title': f'Parameter {param_id}',
+            'description': f'Description of {param_id}',
+            'type': value_type,
+        }
+
+        members = param_members(param, value, value_error)
+        param.update({k: v for k, v in members.items() if v is not None})
+        return param
+    
+    @classmethod
+    def make_item_param(cls, param_id: str, value: str, value_type: str) -> dict:
+        param = {
+            'id': param_id,
+            'title': f'Parameter {param_id}',
+            'description': f'Description of {param_id}',
+            'type': value_type,
+            'scope': 'item',
+            'phase': 'configuration',
+            'value': value,
+        }
+        return param

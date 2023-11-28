@@ -22,7 +22,7 @@ def merge(base: dict, override: dict) -> dict:
     Merge two dictionaries (override into base) recursively.
 
     :param base: The base dictionary.
-    :param override: Override dictionary to be merge into base.
+    :param override: Override dictionary to be merged into base.
     :return dict: The new dictionary.
     """
     new_base = deepcopy(base)

@@ -240,19 +240,11 @@ class Builder:
         value_type: str = 'text',
     ) -> Builder:
         param = find_by_id(self._request.get('asset', {}).get('params', []), param_id)
-
         if param is None:
-            param = {
-                'id': param_id,
-                'name': param_id,
-                'title': f'Asset parameter {param_id}',
-                'description': f'Asset parameter description of {param_id}',
-                'type': value_type,
-            }
+            param = {}
             self._request = merge(self._request, {'asset': {'params': [param]}})
 
-        members = param_members(param, value, value_error)
-        param.update({k: v for k, v in members.items() if v is not None})
+        param.update(AssetBuilder.make_param(param_id, value, value_error, value_type))
         return self
 
     def with_asset_items(self, items: List[dict]) -> Builder:
@@ -275,23 +267,14 @@ class Builder:
     ) -> Builder:
         item = find_by_id(self._request.get('asset', {}).get('items', []), item_id)
         if item is None:
-            item = {'id': item_id}
+            item = {}
             self._request = merge(self._request, {'asset': {'items': [item]}})
-
-        members = {
-            'global_id': global_id,
-            'display_name': display_name,
-            'mpn': item_mpn,
-            'quantity': quantity,
-            'old_quantity': old_quantity,
-            'params': [],
-            'item_type': item_type,
-            'period': period,
-            'type': unit,
-        }
-
-        item.update({k: v for k, v in members.items() if v is not None})
-        self.with_asset_item_params(item_id, [] if params is None else params)
+        
+        item.update(AssetBuilder.make_item(
+            item_id, item_mpn, quantity, old_quantity, item_type, period, unit, display_name, global_id))
+        
+        if params is not None:
+            self.with_asset_item_params(item_id, params)
         return self
 
     def with_asset_item_params(self, item_id: str, params: List[dict]) -> Builder:
@@ -312,18 +295,10 @@ class Builder:
 
         param = find_by_id(item.get('params', []), param_id)
         if param is None:
-            param = {
-                'id': param_id,
-                'title': f'Parameter {param_id}',
-                'description': f'Description of {param_id}',
-                'type': value_type,
-                'scope': 'item',
-                'phase': 'configuration',
-                'value': '',
-            }
+            param = {}
             item['params'].append(param)
 
-        param.update({'value': value})
+        param.update(AssetBuilder.make_item_param(param_id, value, value_type))
         return self
 
     def with_asset_configuration_params(self, params: List[dict]) -> Builder:
@@ -339,19 +314,11 @@ class Builder:
         value_type: str = 'text',
     ) -> Builder:
         param = find_by_id(self._request.get('asset', {}).get('configuration', {}).get('params', []), param_id)
-
         if param is None:
-            param = {
-                'id': param_id,
-                'name': param_id,
-                'title': f'Asset configuration parameter {param_id}',
-                'description': f'Asset parameter configuration description of {param_id}',
-                'type': value_type,
-            }
+            param = {}
             self._request = merge(self._request, {'asset': {'configuration': {'params': [param]}}})
 
-        members = param_members(param, value, value_error)
-        param.update({k: v for k, v in members.items() if v is not None})
+        param.update(AssetBuilder.make_param(param_id, value, value_error, value_type))
         return self
 
     def with_tier_configuration_id(self, tier_configuration_id: str) -> Builder:
