@@ -6,12 +6,12 @@ from abc import abstractmethod
 from copy import deepcopy
 from datetime import datetime, timedelta
 from typing import List, Optional, Union
+from faker import Faker
 
 from connect.client import ConnectClient
 
 from connect.devops_testing.builders import AssetBuilder
 from connect.devops_testing.utils import find_by_id, merge, request_model, request_parameters, param_members, make_tier
-from faker import Faker
 
 
 _asset_template = {
@@ -269,10 +269,10 @@ class Builder:
         if item is None:
             item = {}
             self._request = merge(self._request, {'asset': {'items': [item]}})
-        
+
         item.update(AssetBuilder.make_item(
             item_id, item_mpn, quantity, old_quantity, item_type, period, unit, display_name, global_id))
-        
+
         if params is not None:
             self.with_asset_item_params(item_id, params)
         return self
