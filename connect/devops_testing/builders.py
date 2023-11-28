@@ -20,7 +20,7 @@ class AssetBuilder:
         asset = deepcopy(self._data)
         self._data = deepcopy(self._original)
         return asset
-    
+
     def with_id(self, id: str) -> AssetBuilder:
         self._data = merge(self._data, self.make_id(id))
         return self
@@ -28,7 +28,7 @@ class AssetBuilder:
     def with_status(self, status: str) -> AssetBuilder:
         self._data = merge(self._data, self.make_status(status))
         return self
-    
+
     def with_external_id(self, external_id: str = 'random') -> AssetBuilder:
         self._data = merge(self._data, self.make_external_id(external_id))
         return self
@@ -36,7 +36,7 @@ class AssetBuilder:
     def with_external_uid(self, external_uid: str = 'random') -> AssetBuilder:
         self._data = merge(self._data, self.make_external_uid(external_uid))
         return self
-    
+
     def with_product(self, product_id: str, product_name: str = None, status: str = 'published') -> AssetBuilder:
         self._data = merge(self._data, self.make_product(product_id, product_name, status))
         return self
@@ -52,7 +52,7 @@ class AssetBuilder:
             'name': contract_name,
         }})
         return self
-    
+
     def with_connection(
             self,
             connection_id: str,
@@ -63,7 +63,7 @@ class AssetBuilder:
     ) -> AssetBuilder:
         self._data = merge(self._data, self.make_connection(connection_id, connection_type, provider, vendor, hub))
         return self
-    
+
     def with_connection_provider(self, provider_id: str, provider_name: Optional[str] = None) -> AssetBuilder:
         self._data = merge(self._data, self.make_connection_provider(provider_id, provider_name))
         return self
@@ -75,7 +75,7 @@ class AssetBuilder:
     def with_connection_hub(self, hub_id: str, hub_name: Optional[str] = None) -> AssetBuilder:
         self._data = merge(self._data, self.make_connection_hub(hub_id, hub_name))
         return self
-    
+
     def with_items(self, items: List[dict]) -> AssetBuilder:
         for item in items:
             self.with_item(**item)
@@ -101,7 +101,7 @@ class AssetBuilder:
 
         item.update(self.make_item(
             item_id, item_mpn, quantity, old_quantity, item_type, period, unit, display_name, global_id))
-        
+
         if params is not None:
             self.with_item_params(item_id, params)
         return self
@@ -169,7 +169,7 @@ class AssetBuilder:
 
         param.update(self.make_param(param_id, value, value_error, value_type))
         return self
-    
+
     def with_tier(self, tier_name: str, tier: Union[str, dict]) -> AssetBuilder:
         if isinstance(tier, str):
             self._data.get('tiers', {}).get(tier_name, {}).clear()
@@ -192,7 +192,7 @@ class AssetBuilder:
     @classmethod
     def make_status(cls, status: str) -> dict:
         return {'status': status}
-    
+
     @classmethod
     def make_external_id(cls, external_id: str) -> dict:
         external_id = f"{cls._fake.pyint(1000000, 9999999)}" if external_id == 'random' else external_id
@@ -202,7 +202,7 @@ class AssetBuilder:
     def make_external_uid(cls, external_uid: str) -> dict:
         external_uid = f"{cls._fake.uuid4()}" if external_uid == 'random' else external_uid
         return {'external_uid': external_uid}
-        
+
     @classmethod
     def make_product(cls, product_id: str, product_name: str, status: str) -> dict:
         product = {
@@ -212,14 +212,14 @@ class AssetBuilder:
         if product_name:
             product.update({'name': product_name})
         return {'product': product}
-        
+
     @classmethod
     def make_marketplace(cls, marketplace_id: str, marketplace_name: str) -> dict:
         marketplace = {'id': marketplace_id}
         if marketplace_name:
             marketplace.update({'name': marketplace_name})
         return {'marketplace': marketplace}
-        
+
     @classmethod
     def make_connection(cls,
         connection_id: str,
@@ -232,27 +232,27 @@ class AssetBuilder:
             'id': connection_id,
             'type': connection_type,
         }
-        
+
         if provider is not None:
             connection.update({'provider': {
                 'id': provider.get('id'),
                 'name': provider.get('name'),
             }})
-        
+
         if vendor is not None:
             connection.update({'vendor': {
                 'id': vendor.get('id'),
                 'name': vendor.get('name'),
             }})
-        
+
         if hub is not None:
             connection.update({'hub': {
                 'id': hub.get('id'),
                 'name': hub.get('name'),
             }})
-        
+
         return {'connection': connection}
-        
+
     @classmethod
     def make_connection_provider(cls, provider_id: str, provider_name: str) -> dict:
         connection = {'provider': {
@@ -260,7 +260,7 @@ class AssetBuilder:
             'name': provider_name,
         }}
         return {'connection': connection}
-        
+
     @classmethod
     def make_connection_vendor(cls, vendor_id: str, vendor_name: str) -> dict:
         connection = {'vendor': {
@@ -268,7 +268,7 @@ class AssetBuilder:
             'name': vendor_name,
         }}
         return {'connection': connection}
-        
+
     @classmethod
     def make_connection_hub(cls, hub_id: str, hub_name: str) -> dict:
         connection = {'hub': {
@@ -276,13 +276,13 @@ class AssetBuilder:
             'name': hub_name,
         }}
         return {'connection': connection}
-        
+
     @classmethod
     def make_tier(cls, tier_name: str, tier: Union[str, dict]) -> dict:
         if isinstance(tier, str):
             tier = make_tier(tier_name) if tier == 'random' else {'id': tier}
         return {'tiers': {tier_name: tier}}
-    
+
     @classmethod
     def make_item(cls,
         item_id: str,
@@ -296,7 +296,7 @@ class AssetBuilder:
         global_id: str
     ) -> dict:
         item = {'id': item_id, 'params': []}
-        
+
         members = {
             'mpn': item_mpn,
             'quantity': quantity,
@@ -308,9 +308,9 @@ class AssetBuilder:
             'global_id': global_id,
         }
         item.update({k: v for k, v in members.items() if v is not None})
-        
+
         return item
-    
+
     @classmethod
     def make_param(cls, param_id: str, value: Union[str, dict, list], value_error: str, value_type: str) -> dict:
         param = {
@@ -324,7 +324,7 @@ class AssetBuilder:
         members = param_members(param, value, value_error)
         param.update({k: v for k, v in members.items() if v is not None})
         return param
-    
+
     @classmethod
     def make_item_param(cls, param_id: str, value: str, value_type: str) -> dict:
         param = {
