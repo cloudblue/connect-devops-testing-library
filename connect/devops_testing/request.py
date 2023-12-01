@@ -6,10 +6,13 @@ from abc import abstractmethod
 from copy import deepcopy
 from datetime import datetime, timedelta
 from typing import List, Optional, Union
+from faker import Faker
 
 from connect.client import ConnectClient
-from connect.devops_testing.utils import find_by_id, merge, request_model, request_parameters
-from faker import Faker
+
+from connect.devops_testing.builders import AssetBuilder
+from connect.devops_testing.utils import find_by_id, merge, request_model, request_parameters, param_members, make_tier
+
 
 _asset_template = {
     "type": "purchase",
@@ -57,26 +60,6 @@ _tier_config_template = {
 }
 
 
-def _param_members(
-        param: dict,
-        value: Optional[Union[str, dict, list]] = None,
-        value_error: Optional[str] = None,
-) -> dict:
-    if isinstance(value, dict):
-        key = 'structured_value'
-        new_value = param.get(key, {})
-        new_value.update(value)
-    elif isinstance(value, list):
-        key = 'structured_value'
-        new_value = param.get(key, [])
-        new_value.extend(value)
-    else:
-        key = 'value'
-        new_value = value
-
-    return {key: new_value, 'value_error': value_error}
-
-
 class Builder:
     def __init__(self, request: Optional[dict] = None):
         if request is None:
@@ -88,33 +71,6 @@ class Builder:
         self._original = deepcopy(request)
         self._request = deepcopy(request)
         self._fake = Faker(['en_US'])
-
-    def _make_tier(self, tier_type: str = 'customer') -> dict:
-        return {
-            "name": self._fake.company(),
-            "type": tier_type,
-            "external_id": f"{self._fake.pyint(1000000, 9999999)}",
-            "external_uid": f"{self._fake.uuid4()}",
-            "contact_info": {
-                "address_line1": f"{self._fake.pyint(100, 999)}, {self._fake.street_name()}",
-                "address_line2": self._fake.secondary_address(),
-                "city": self._fake.city(),
-                "state": self._fake.state(),
-                "postal_code": self._fake.zipcode(),
-                "country": self._fake.country_code(),
-                "contact": {
-                    "first_name": self._fake.first_name(),
-                    "last_name": self._fake.last_name(),
-                    "email": self._fake.company_email(),
-                    "phone_number": {
-                        "country_code": f"+{self._fake.pyint(1, 99)}",
-                        "area_code": f"{self._fake.pyint(1, 99)}",
-                        "phone_number": f"{self._fake.pyint(1, 999999)}",
-                        "extension": f"{self._fake.pyint(1, 100)}",
-                    },
-                },
-            },
-        }
 
     @classmethod
     def from_file(cls, path: str) -> Builder:
@@ -158,7 +114,7 @@ class Builder:
         self._request = merge(self._request, {'reason': reason})
         return self
 
-    def with_status(self, request_status) -> Builder:
+    def with_status(self, request_status: str) -> Builder:
         self._request = merge(self._request, {'status': request_status})
         return self
 
@@ -168,11 +124,11 @@ class Builder:
         return self
 
     def with_param(
-            self,
-            param_id: str,
-            value: Optional[Union[str, dict, list]] = None,
-            value_error: Optional[str] = None,
-            value_type: str = 'text',
+        self,
+        param_id: str,
+        value: Optional[Union[str, dict, list]] = None,
+        value_error: Optional[str] = None,
+        value_type: str = 'text',
     ) -> Builder:
         param = find_by_id(self._request.get('params', []), param_id)
 
@@ -186,7 +142,7 @@ class Builder:
             }
             self._request = merge(self._request, {'params': [param]})
 
-        members = _param_members(param, value, value_error)
+        members = param_members(param, value, value_error)
         param.update({k: v for k, v in members.items() if v is not None})
         return self
 
@@ -206,97 +162,60 @@ class Builder:
         return self
 
     def with_asset_id(self, asset_id: str) -> Builder:
-        self._request = merge(self._request, {'asset': {'id': asset_id}})
+        self._request = merge(self._request, {'asset': AssetBuilder.make_id(asset_id)})
         return self
 
     def with_asset_external_id(self, external_id: str = 'random') -> Builder:
-        external_id = f"{self._fake.pyint(1000000, 9999999)}" if external_id == 'random' else external_id
-        self._request = merge(self._request, {'asset': {'external_id': external_id}})
+        self._request = merge(self._request, {'asset': AssetBuilder.make_external_id(external_id)})
         return self
 
     def with_asset_external_uid(self, external_uid: str = 'random') -> Builder:
-        external_uid = f"{self._fake.uuid4()}" if external_uid == 'random' else external_uid
-        self._request = merge(self._request, {'asset': {'external_uid': external_uid}})
+        self._request = merge(self._request, {'asset': AssetBuilder.make_external_uid(external_uid)})
         return self
 
     def with_asset_status(self, asset_status: str) -> Builder:
-        self._request = merge(self._request, {'asset': {'status': asset_status}})
+        self._request = merge(self._request, {'asset': AssetBuilder.make_status(asset_status)})
         return self
 
     def with_asset_product(self, product_id: str, product_name: str = None, status: str = 'published') -> Builder:
-        product = {
-            'id': product_id,
-            'status': status,
-        }
-        if product_name:
-            product.update({'name': product_name})
-        self._request = merge(self._request, {'asset': {'product': product}})
+        self._request = merge(self._request, {'asset': AssetBuilder.make_product(product_id, product_name, status)})
         return self
 
     def with_asset_marketplace(self, marketplace_id: str, marketplace_name: str = None) -> Builder:
-        marketplace = {'id': marketplace_id}
-        if marketplace_name:
-            marketplace.update({'name': marketplace_name})
-        self._request = merge(self._request, {'asset': {'marketplace': marketplace}})
+        self._request = merge(self._request, {'asset': AssetBuilder.make_marketplace(marketplace_id, marketplace_name)})
         return self.with_marketplace(marketplace_id, marketplace_name)
 
     def with_asset_connection(
-            self,
-            connection_id: str,
-            connection_type: str,
-            provider: Optional[dict] = None,
-            vendor: Optional[dict] = None,
-            hub: Optional[dict] = None,
+        self,
+        connection_id: str,
+        connection_type: str,
+        provider: Optional[dict] = None,
+        vendor: Optional[dict] = None,
+        hub: Optional[dict] = None,
     ) -> Builder:
-        self._request = merge(self._request, {'asset': {'connection': {
-            'id': connection_id,
-            'type': connection_type,
-        }}})
-        if provider is not None:
-            self.with_asset_connection_provider(
-                provider_id=provider.get('id'),
-                provider_name=provider.get('name'),
-            )
-        if vendor is not None:
-            self.with_asset_connection_vendor(
-                vendor_id=vendor.get('id'),
-                vendor_name=vendor.get('name'),
-            )
-        if hub is not None:
-            self.with_asset_connection_hub(
-                hub_id=hub.get('id'),
-                hub_name=hub.get('name'),
-            )
-
+        connection = AssetBuilder.make_connection(connection_id, connection_type, provider, vendor, hub)
+        self._request = merge(self._request, {'asset': connection})
         return self
 
     def with_asset_connection_provider(self, provider_id: str, provider_name: Optional[str] = None) -> Builder:
-        self._request = merge(self._request, {'asset': {'connection': {'provider': {
-            'id': provider_id,
-            'name': provider_name,
-        }}}})
+        connection = AssetBuilder.make_connection_provider(provider_id, provider_name)
+        self._request = merge(self._request, {'asset': connection})
         return self
 
     def with_asset_connection_vendor(self, vendor_id: str, vendor_name: Optional[str] = None) -> Builder:
-        self._request = merge(self._request, {'asset': {'connection': {'vendor': {
-            'id': vendor_id,
-            'name': vendor_name,
-        }}}})
+        connection = AssetBuilder.make_connection_vendor(vendor_id, vendor_name)
+        self._request = merge(self._request, {'asset': connection})
         return self
 
     def with_asset_connection_hub(self, hub_id: str, hub_name: Optional[str] = None) -> Builder:
-        self._request = merge(self._request, {'asset': {'connection': {'hub': {
-            'id': hub_id,
-            'name': hub_name,
-        }}}})
+        connection = AssetBuilder.make_connection_hub(hub_id, hub_name)
+        self._request = merge(self._request, {'asset': connection})
         return self
 
     def with_asset_tier(self, tier_name: str, tier: Union[str, dict]) -> Builder:
         if isinstance(tier, str):
             self._request.get('asset', {}).get('tiers', {}).get(tier_name, {}).clear()
-            tier = self._make_tier(tier_name) if tier == 'random' else {'id': tier}
-
-        self._request = merge(self._request, {'asset': {'tiers': {tier_name: tier}}})
+        self._request = merge(self._request, {'asset': AssetBuilder.make_tier(tier_name, tier)})
         return self
 
     def with_asset_tier_customer(self, customer_id: Union[str, dict]) -> Builder:
@@ -314,26 +233,19 @@ class Builder:
         return self
 
     def with_asset_param(
-            self,
-            param_id: str,
-            value: Optional[Union[str, dict, list]] = None,
-            value_error: Optional[str] = None,
-            value_type: str = 'text',
+        self,
+        param_id: str,
+        value: Optional[Union[str, dict, list]] = None,
+        value_error: Optional[str] = None,
+        value_type: str = 'text',
     ) -> Builder:
         param = find_by_id(self._request.get('asset', {}).get('params', []), param_id)
-
         if param is None:
-            param = {
-                'id': param_id,
-                'name': param_id,
-                'title': f'Asset parameter {param_id}',
-                'description': f'Asset parameter description of {param_id}',
-                'type': value_type,
-            }
+            param = AssetBuilder.make_param(param_id, value, value_error, value_type)
             self._request = merge(self._request, {'asset': {'params': [param]}})
-
-        members = _param_members(param, value, value_error)
-        param.update({k: v for k, v in members.items() if v is not None})
+        else:
+            members = param_members(param, value, value_error)
+            param.update({k: v for k, v in members.items() if v is not None})
         return self
 
     def with_asset_items(self, items: List[dict]) -> Builder:
@@ -342,37 +254,28 @@ class Builder:
         return self
 
     def with_asset_item(
-            self,
-            item_id: str,
-            item_mpn: str,
-            quantity: str = '1',
-            old_quantity: Optional[str] = None,
-            item_type: Optional[str] = None,
-            period: Optional[str] = None,
-            unit: Optional[str] = None,
-            display_name: Optional[str] = None,
-            global_id: Optional[str] = None,
-            params: Optional[List[dict]] = None,
+        self,
+        item_id: str,
+        item_mpn: str,
+        quantity: str = '1',
+        old_quantity: Optional[str] = None,
+        item_type: Optional[str] = None,
+        period: Optional[str] = None,
+        unit: Optional[str] = None,
+        display_name: Optional[str] = None,
+        global_id: Optional[str] = None,
+        params: Optional[List[dict]] = None,
     ) -> Builder:
         item = find_by_id(self._request.get('asset', {}).get('items', []), item_id)
         if item is None:
-            item = {'id': item_id}
+            item = {}
             self._request = merge(self._request, {'asset': {'items': [item]}})
 
-        members = {
-            'global_id': global_id,
-            'display_name': display_name,
-            'mpn': item_mpn,
-            'quantity': quantity,
-            'old_quantity': old_quantity,
-            'params': [],
-            'item_type': item_type,
-            'period': period,
-            'type': unit,
-        }
+        item.update(AssetBuilder.make_item(
+            item_id, item_mpn, quantity, old_quantity, item_type, period, unit, display_name, global_id))
 
-        item.update({k: v for k, v in members.items() if v is not None})
-        self.with_asset_item_params(item_id, [] if params is None else params)
+        if params is not None:
+            self.with_asset_item_params(item_id, params)
         return self
 
     def with_asset_item_params(self, item_id: str, params: List[dict]) -> Builder:
@@ -381,11 +284,11 @@ class Builder:
         return self
 
     def with_asset_item_param(
-            self,
-            item_id: str,
-            param_id: str,
-            value: str = '',
-            value_type: str = 'text',
+        self,
+        item_id: str,
+        param_id: str,
+        value: str = '',
+        value_type: str = 'text',
     ) -> Builder:
         item = find_by_id(self._request.get('asset', {}).get('items', []), item_id)
         if item is None:
@@ -393,18 +296,10 @@ class Builder:
 
         param = find_by_id(item.get('params', []), param_id)
         if param is None:
-            param = {
-                'id': param_id,
-                'title': f'Parameter {param_id}',
-                'description': f'Description of {param_id}',
-                'type': value_type,
-                'scope': 'item',
-                'phase': 'configuration',
-                'value': '',
-            }
+            param = {}
             item['params'].append(param)
 
-        param.update({'value': value})
+        param.update(AssetBuilder.make_item_param(param_id, value, value_type))
         return self
 
     def with_asset_configuration_params(self, params: List[dict]) -> Builder:
@@ -413,26 +308,19 @@ class Builder:
         return self
 
     def with_asset_configuration_param(
-            self,
-            param_id: str,
-            value: Optional[Union[str, dict, list]] = None,
-            value_error: Optional[str] = None,
-            value_type: str = 'text',
+        self,
+        param_id: str,
+        value: Optional[Union[str, dict, list]] = None,
+        value_error: Optional[str] = None,
+        value_type: str = 'text',
     ) -> Builder:
         param = find_by_id(self._request.get('asset', {}).get('configuration', {}).get('params', []), param_id)
-
         if param is None:
-            param = {
-                'id': param_id,
-                'name': param_id,
-                'title': f'Asset configuration parameter {param_id}',
-                'description': f'Asset parameter configuration description of {param_id}',
-                'type': value_type,
-            }
+            param = AssetBuilder.make_param(param_id, value, value_error, value_type)
             self._request = merge(self._request, {'asset': {'configuration': {'params': [param]}}})
-
-        members = _param_members(param, value, value_error)
-        param.update({k: v for k, v in members.items() if v is not None})
+        else:
+            members = param_members(param, value, value_error)
+            param.update({k: v for k, v in members.items() if v is not None})
         return self
 
     def with_tier_configuration_id(self, tier_configuration_id: str) -> Builder:
@@ -516,7 +404,7 @@ class Builder:
         return self
 
     def with_tier_configuration_account(self, account_id: str = 'random') -> Builder:
-        account = self._make_tier('reseller') if account_id == 'random' else {'id': account_id}
+        account = make_tier('reseller') if account_id == 'random' else {'id': account_id}
 
         self._request = merge(self._request, {'configuration': {'account': account}})
         return self
@@ -548,7 +436,7 @@ class Builder:
             }
             self._request = merge(self._request, {'configuration': {'params': [param]}})
 
-        members = _param_members(param, value, value_error)
+        members = param_members(param, value, value_error)
         param.update({k: v for k, v in members.items() if v is not None})
 
         return self.with_param(param_id, value, value_error, value_type)
@@ -573,7 +461,7 @@ class Builder:
             }
             self._request = merge(self._request, {'configuration': {'configuration': {'params': [param]}}})
 
-        members = _param_members(param, value, value_error)
+        members = param_members(param, value, value_error)
         param.update({k: v for k, v in members.items() if v is not None})
 
         return self
@@ -627,7 +515,7 @@ class Dispatcher:
             max_attempt: Optional[int] = None,
     ) -> dict:
         """
-        Provision the given request into the Connect platform and waits util
+        Provisions the given request into the Connect platform and waits until
         the request is processed by some processor (can be manually processed)
 
         :param request: dict The request to be processed.

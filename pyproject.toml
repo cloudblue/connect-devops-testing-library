@@ -98,4 +98,6 @@ show_source = true
 max_line_length = 120
 import-order-style = 'smarkets'
 max_cognitive_complexity = 15
-ignore = ['FI1', 'I100', 'W503', 'FI58']
+ignore = ['FI1', 'I100', 'W503', 'FI58', 'I201', 'I202', 'I101', 'C812', 'E128', 'E124']
+
+
