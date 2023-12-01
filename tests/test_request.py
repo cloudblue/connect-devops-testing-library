@@ -145,7 +145,7 @@ def test_request_builder_should_build_successfully_a_valid_asset_request():
     assert request['asset']['configuration']['params'][0]['value_error'] == 'Cfg error value updated'
 
     assert request['asset']['configuration']['params'][1]['id'] == 'IS_A_LIST_001'
-    assert request['asset']['configuration']['params'][1]['structured_value'] == [3, 4]
+    assert request['asset']['configuration']['params'][1]['structured_value'] == [1, 2, 3, 4]
 
 
 def test_request_builder_should_build_successfully_a_valid_tier_config_request():

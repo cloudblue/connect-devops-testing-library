@@ -241,10 +241,11 @@ class Builder:
     ) -> Builder:
         param = find_by_id(self._request.get('asset', {}).get('params', []), param_id)
         if param is None:
-            param = {}
+            param = AssetBuilder.make_param(param_id, value, value_error, value_type)
             self._request = merge(self._request, {'asset': {'params': [param]}})
-
-        param.update(AssetBuilder.make_param(param_id, value, value_error, value_type))
+        else:
+            members = param_members(param, value, value_error)
+            param.update({k: v for k, v in members.items() if v is not None})
         return self
 
     def with_asset_items(self, items: List[dict]) -> Builder:
@@ -315,10 +316,11 @@ class Builder:
     ) -> Builder:
         param = find_by_id(self._request.get('asset', {}).get('configuration', {}).get('params', []), param_id)
         if param is None:
-            param = {}
+            param = AssetBuilder.make_param(param_id, value, value_error, value_type)
             self._request = merge(self._request, {'asset': {'configuration': {'params': [param]}}})
-
-        param.update(AssetBuilder.make_param(param_id, value, value_error, value_type))
+        else:
+            members = param_members(param, value, value_error)
+            param.update({k: v for k, v in members.items() if v is not None})
         return self
 
     def with_tier_configuration_id(self, tier_configuration_id: str) -> Builder:

@@ -346,4 +346,3 @@ def test_step_should_successfully_process_the_request(sync_client_factory, respo
         assert behave_context.request['id'] == 'PR-000-000-000-000'
         assert behave_context.request['type'] == 'purchase'
         assert behave_context.request['status'] == 'approved'
-
